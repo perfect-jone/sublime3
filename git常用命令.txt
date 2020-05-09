@@ -1,0 +1,54 @@
+git常用命令：
+
+git init
+
+git status
+
+git add readme.txt
+
+git commit -m "write a readme file"
+
+git log	查看提交历史
+
+git reset --head^	回到上个版本
+
+git reset --head 1094a（commit id） 回到某个版本
+
+commit id可以通过 git reflog查看命令历史
+
+git checkout -- readme.txt 	把readme.txt文件在工作区的修改全部撤销
+
+git reset head readme.txt   可以把暂存区的修改撤销掉（unstage）,然后再git checkout -- readme.txt
+
+git rm删掉，并且git commit
+
+git remote add origin git@github.com:perfect-jone/repo-name.git 关联一个远程库
+如果报错fatal: remote origin already exists.则执行git remote rm origin命令重新添加
+
+
+git push -u origin master 关联后，使用命令第一次推送master分支的所有内容
+
+git push origin master 此后，每次本地提交后，只要有必要，就可以使用命令推送最新修改
+
+***************************************************
+git关联不到gitHub，报错：git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+Please make sure you have the correct access rights
+and the repository exists.
+
+解决方案：
+1.ssh-keygen -t rsa -C "youremail@example.com" 生产公钥
+2.ssh -v git@github.com 查看公钥id_rsa.pub所在路径，去该路径复制公钥
+3.在github中 Settings-->SSH and GPG keys-->New SSH key中添加复制的公钥
+
+
+***************************************************
+
+git版本库push到gitHub,报错：SSL certificate problem:self signed certificate in certificate chain。
+解决方案：打开git的控制端黑窗口(Git Bash Here)，输入：
+git config --global http.sslVerify false
+点击Entry之后，就会去掉git的ssl验证。
+
+然后就可以正常从git版本库push到gitHub。
+
+***************************************************
