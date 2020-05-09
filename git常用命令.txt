@@ -22,6 +22,25 @@ git reset head readme.txt   可以把暂存区的修改撤销掉（unstage）,�
 
 git rm删掉，并且git commit
 
+使用如下命令将本地仓库和远程仓库连接
+git remote add [-t <branch>] [-m <master>] [-f] [--[no-]tags] [--mirror=<fetch|push>] <name> <url>
+
+简化版,
+git remote add 远程仓库的名字(自己起) 远程仓库的地址
+
+具体例子
+git remote add origin git@github.com:naruto/hinata.git
+
+查看远程仓库详细信息
+git remote -v
+
+删除远程仓库
+git remote remove 远程仓库名
+
+修改远程仓库名
+git remote rename old_name new_name
+
+
 git remote add origin git@github.com:perfect-jone/repo-name.git 关联一个远程库
 如果报错fatal: remote origin already exists.则执行git remote rm origin命令重新添加
 
