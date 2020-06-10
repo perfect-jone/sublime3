@@ -1,0 +1,2200 @@
+
+apache档案馆：http://archive.apache.org/dist
+CentOS http://vault.centos.org
+Navicat Premuim 12.1.17.0破解版：https://www.jianshu.com/p/5f693b4c9468?mType=Group
+CDH档案馆：
+		CM下载地址：http://archive.cloudera.com/cm5/cm/5/
+		CDH安装包： http://archive.cloudera.com/cdh5/parcels/
+企业版CDH5.15.1文档：https://www.cloudera.com/documentation/enterprise/5-15-x.html
+***Linux***
+
+****Linux中的标准输入输出****
+
+Linux 输入输出重定向
+名称	                代码	  操作符	             Java中表示	          Linux 下文件描述符（Debian 为例)
+标准输入(stdin)	     0	    < 或 <<	             System.in	          /dev/stdin -> /proc/self/fd/0 -> /dev/pts/0
+标准输出(stdout)	     1	    >, >>, 1> 或 1>>	     System.out	          /dev/stdout -> /proc/self/fd/1 -> /dev/pts/0
+标准错误输出(stderr)	 2	    2> 或 2>>	         System.err	          /dev/stderr -> /proc/self/fd/2 -> /dev/pts/0
+
+标准输入0    从键盘获得输入 /proc/self/fd/0 
+标准输出1    输出到屏幕（即控制台） /proc/self/fd/1 
+错误输出2    输出到屏幕（即控制台） /proc/self/fd/2 
+
+/dev/null代表linux的空设备文件，所有往这个文件里面写入的内容都会丢失，俗称“黑洞”
+
+如果想要正常输出和错误信息都不显示，则要把标准输出和标准错误都重定向到/dev/null， 例如：
+
+ ping www.baidu.com >/dev/null 2>/dev/null         ping www.baidu.com >/dev/null 2>&1
+ nohup java -jar lib/sn_devproject-8.2-20191008.085238-1.jar > /dev/null 2>&1 &
+
+
+ll / > a.log 2>&1
+     "ll / > a.log"指将"ll /"命令标准输出重定向到a.log文件中;
+     "2>&1"指将标准错误重定向到标准输出;
+     由于标准输出已经重定向到了a.log，因此标准错误也会重定向到a.log
+ 
+ 
+nohup命令可以将程序以忽略挂起信号的方式运行起来，被运行的程序的输出信息将不会显示到终端。
+
+无论是否将 nohup 命令的输出重定向到终端，输出都将附加到当前目录的 nohup.out 文件中。如果当前目录的 nohup.out 文件不可写，输出重定向到$HOME/nohup.out文件中。如果没有文件能创建或打开以用于追加，那么 command 参数指定的命令不可调用。如果标准错误是一个终端，那么把指定的命令写给标准错误的所有输出作为标准输出重定向到相同的文件描述符。
+由于使用nohup时，会自动将输出写入nohup.out文件中，如果文件很大的话，nohup.out就会不停的增大，这是我们不希望看到的，因此，可以利用/dev/null来解决这个问题。
+
+nohup ./program >/dev/null 2>log &
+
+如果错误信息也不想要的话,&是让程序在后台运行：
+
+nohup ./program >/dev/null 2>&1 &
+ 
+****Linux中的标准输入输出****
+
+
+
+
+ulimit 用于限制 shell 启动进程所占用的资源，支持以下各种类型的限制：所创建的内核文件的大小、进程数据块的大小、Shell 进程创建文件的大小、内存锁住的大小、常驻内存集的大小、打开文件描述符的数量、分配堆栈的最大大小、CPU 时间、单个用户的最大线程数、Shell 进程所能使用的最大虚拟内存。同时，它支持硬资源和软资源的限制。
+
+
+-a：显示目前资源限制的设定；
+-c <core文件上限>：设定core文件的最大值，单位为区块；
+-d <数据节区大小>：程序数据节区的最大值，单位为KB；
+-f <文件大小>：shell所能建立的最大文件，单位为区块；
+-H：设定资源的硬性限制，也就是管理员所设下的限制；
+-m <内存大小>：指定可使用内存的上限，单位为KB；
+-n <文件数目>：指定同一时间最多可开启的文件数；
+-p <缓冲区大小>：指定管道缓冲区的大小，单位512字节；
+-s <堆叠大小>：指定堆叠的上限，单位为KB；
+-S：设定资源的弹性限制；
+-t <CPU时间>：指定CPU使用时间的上限，单位为秒；
+-u <程序数目>：用户最多可开启的程序数目；
+-v <虚拟内存大小>：指定可使用的虚拟内存上限，单位为KB。
+
+
+
+VMware12部分问题
+
+如果安装完VMware12之后显示如下提示：You do not have permission to enter a license key. Try again using the syste.
+解决方案：覆盖安装即可（之前安装的不用删除，再安装一次即可）
+
+VMware 12 Pro 永久许可证激活密钥:
+5A02H-AU243-TZJ49-GTC7K-3C61N
+VF5XA-FNDDJ-085GZ-4NXZ9-N20E6
+UC5MR-8NE16-H81WY-R7QGV-QG2D8
+
+第一种：动态获取ip
+	系统》首选项》网络连接》编辑》自动连接（三种网络配置模式：桥接模式:处在相同网段，容易造成IP冲突;NAT模式：不会IP冲突，内网的人不能和虚拟机通讯;主机模式）
+centos7.4
+
+
+
+1.第二种：静态设置静止的ip:
+	vim /etc/sysconfig/network-scripts/ifcfg-eth0 
+	
+		DEVICE=eth0
+		TYPE=Ethernet
+		UUID=e4a3828c-bd8c-4828-9ae0-1260c18b6b86
+		ONBOOT=yes
+		NM_CONTROLLED=yes
+		BOOTPROTO=static
+		DEFROUTE=yes
+		IPV4_FAILURE_FATAL=yes
+		IPV6INIT=no
+		NAME="System eth0"
+		IPADDR=192.168.3.128
+		GATEWAY=192.168.3.2
+		DNS1=192.168.3.2
+		HWADDR=00:0C:29:7D:08:52
+		PEERDNS=yes
+		PEERROUTES=yes
+		LAST_CONNECT=1547702863
+		
+	service network restart		重启服务配置文件才能生效
+	
+重启计算机：reboot
+关闭计算机：shutdown -h now
+###IP 主机名 映射 防火墙
+
+2.修改主机名：vim /etc/sysconfig/network
+
+3.配置hosts映射文件：vim /etc/hosts
+4.修改window7的主机映射文件（hosts文件）进入C:\Windows\System32\drivers\etc路径
+
+克隆：
+
+1.修改克隆后的网卡，删掉eth0,将eth1改为eth0，复制eth1的物理地址:vim /etc/udev/rules.d/70-persistent-net.rules
+2.修改IP地址：vim /etc/sysconfig/network-scripts/ifcfg-eth0，把复制eth1的物理地址更新 service network restart
+3.修改主机名：vim /etc/sysconfig/network   hostnamectl set-hostname hadoop101
+关闭防火墙 禁用防火墙
+关闭SELINUX 禁用SELINUX
+ntp
+xsync
+ssh
+
+4.重启服务器：reboot
+
+sudo 设置普通用户具有root权限  vim /etc/sudoers
+
+用户管理：
+	增：useradd 用户名	passwd 用户名         useradd -g 组名 用户名      passwd 用户名
+	删：userdel 用户名
+	改：usermod -g 用户组 用户名
+	查：id 用户名
+	cat /etc/passwd   查询有哪些用户，并列出用户的详细信息
+	cat /etc/shadow   查询用户密码信息
+	cat /etc/group    查询组信息
+组管理：
+	增：groupadd 组名
+	删：groupdel 组名
+	改：groupmod -n 新组名 老组名
+	查：cat /etc/group    查看创建了哪些组
+
+修改文件所有者：chown 用户名 文件名
+修改文件所在组：chgrp 组名 文件名
+改变用户所在组：
+ 1) usermod   –g   组名  用户名
+ 2) usermod   –d   目录名  用户名  改变该用户登陆的初始目录。
+ 改变用户的所有者和所有组：chown -R newowner:newgroup  file 
+ 修改权限：通过数字：chmod 777（r4-w2-x1） 文件/目录  chmod {u|g|o|a +/-/= r/w/x}
+
+（1）查询是否安装Java软件：
+[atguigu@hadoop101 opt]$ rpm -qa | grep java
+（2）如果安装的版本低于1.7，卸载该JDK：
+[atguigu@hadoop101 opt]$ sudo rpm -e --nodeps 软件包
+（3）解压JDK到/opt/module目录下
+[atguigu@hadoop101 software]$ tar -zxvf jdk-8u144-linux-x64.tar.gz -C /opt/module/
+（4）先获取JDK路径
+[atguigu@hadoop101 jdk1.8.0_144]$ pwd
+/opt/module/jdk1.8.0_144
+（5）打开/etc/profile文件
+[atguigu@hadoop101 software]$ sudo vim /etc/profile
+（6）在profile文件末尾添加JDK路径
+			#JAVA_HOME
+			export JAVA_HOME=/opt/module/jdk1.8.0_144
+			export PATH=$PATH:$JAVA_HOME/bin
+			#HADOOP_HOME
+			export HADOOP_HOME=/opt/module/hadoop-2.7.2
+			export PATH=$PATH:$HADOOP_HOME/bin
+			export PATH=$PATH:$HADOOP_HOME/sbin
+（7）使配置文件立即生效
+source /etc/profile
+
+$PATH：决定了shell将到哪些目录中寻找命令或程序，PATH的值是一系列目录，当运行一个程序时，Linux在这些目录下进行搜寻编译链接。
+
+开发中liunx常用命令
+1、rpm -qa | grep gcj或者rpm -qa | grep jdk(Red-Hat Package Manager -query all | global search regular expression and print out the line)查看jdk的具体信息，通过和java -version里面的jdk版本比较，用rpm -e --nodeps java-1.5.0-gcj-1.5.0.0-29.1.el6.x86_64命令卸载相应的jdk；
+2、查看ip命令ifconfig
+3. 系统》首选项》网络连接》编辑》自动连接  service network restart 重启网络     分配ip地址
+
+netstat -ntlp(显示ip/tcp/listening/programs) 显示端口
+
+
+4.开启防火墙：
+service iptables start
+查看防火墙状态：f
+service iptables status
+关闭防火墙：
+service iptables stop
+
+关闭开机启动：
+chkconfig iptables --list
+chkconfig iptables off
+
+
+
+CentOS7 的防火墙配置跟以前版本有很大区别，CentOS7这个版本的防火墙默认使用的是firewall，与之前的版本使用iptables不一样
+
+1、关闭防火墙：
+systemctl（system control） stop firewalld
+
+
+2、开启防火墙：
+systemctl start firewalld
+systemctl restart firewalld重启
+
+ 
+3、关闭开机启动：
+systemctl disable firewalld
+
+ 
+4、开启开机启动：
+systemctl enable firewalld
+
+防火墙状态：
+firewall-cmd --state
+
+防火墙应用列表
+firewall-cmd --list-all
+
+
+
+free -h看内存，df -h看磁盘空间
+
+xshell快捷键：
+ctrl a 光标移动到开头
+ctrl e 光标移动到末尾
+ctrl u 删除光标左边
+ctrl k 删除光标右边
+
+
+查看进程的三种方式：
+1.ps -ef | grep redis(process -e显示所有程序f:UID,PPIP,C与STIME栏位) | 是管道符，表明ps命令和ef命令同时进行
+
+2.lsof -i :6379(list open files -i显示符合条件的进程)
+lsof -i[46] [protocol][@hostname|hostaddr][:service|port]
+  46 --> IPv4 or IPv6
+  protocol --> TCP or UDP
+  hostname --> Internet host name
+  hostaddr --> IPv4地址
+  service --> /etc/service中的 service name (可以不止一个)
+  port --> 端口号 (可以不止一个)
+
+3.netstat -apn | grep 6379
+netstat -apn | grep redis
+
+
+at 23:00（一次性计划）     at -l    atrm（删除计划）
+halt(必须root权限)
+ 
+crontab -e(周期性计划)
+***Linux***
+
+查找文件安装路径：find  / -name kafka[zookeeper]
+
+***Windows***
+
+要进入E:\Program Files (x86)\vue-cli\firstApp有两种方法：
+第一种：先进入e盘，再cd到具体的盘符
+C:\Users\Administrator>e:
+E:\>cd Program Files (x86)\vue-cli\firstApp
+E:\Program Files (x86)\vue-cli\firstApp>
+第二种：找到需要进入的目录，shift键加右键，打开命令台窗口
+
+***Windows***
+	
+	
+
+***git***
+
+git init 
+git config user.name jone 
+git config user.email xiaodai@atjone.com
+git config --global user.name jone
+git config --global user.email xiaodai@atjone.com
+git status
+git add [file]
+git commit -m "commit message" [file]
+git reflog
+git reset --hard [hash索引值]
+
+本地仓库在/d/Users/GitRepository 要把/f/Linux文件夹下的Linux文档.txt上传到gitHub上，具体步骤如下
+cd /f/Linux 
+init 
+git add Linux文档.txt（添加到暂存区）
+git commit -m "this is linux document" Linux文档.txt（提交到本地）
+git remote -v 查看当前所有远程地址别名
+git remote add <name别名> <url要推送抓取的gitHub的远程地址>  增加远程地址
+
+安装git:
+yum install -y git         -y就不用每次都点yes了
+yum install curl-devel expat-devel gettext-devel openssl-devel zlib-devel
+wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.21.0.tar.gz 
+tar -zxvf git-2.21.0.tar.gz
+cd git-2.21.0
+make prefix=/usr/local all
+sudo make prefix=/usr/local install
+
+***git***
+
+https://github.com/perfect-jone/mywork.git (pull)
+
+***tomcat***
+
+注意:tomcat下载之前必须要有jdk环境
+
+1.官网下载tar结尾的tomcat压缩包,保存到Windows系统上
+2.利用Xshell软件远程连接Linux服务器，在usr/local/src目录下新建tomcat目录
+3.利用Xftp(file transfer protocal 文件传输协议)软件把下载好的tomcat从Windows系统上传到Linux系统中第2步新建的tomcat目录
+4.cd /usr/local/src/tomcat(进入到tomcat目录)——>ls——>tar -zxvf tomcat压缩包名称(解压)——>tomcat -version(查看tomcat版本)
+
+cd usr/local/src/tomcat——>ls——>解压过的tomcat目录名称（例如：apache-tomcat-8.5.36） apache-tomcat-8.5.36.tar.gz ——>
+cd apache-tomcat-8.5.36——>1.开启tomcat服务：		进入bin目录   ./starup.sh
+						  2.关闭tomcat服务: 		进入bin目录   ./shutdown.sh
+						  3.修改端口号：    		进入conf目录  vim server.xml(Insert键插入 ESC键退出编辑  :wq写入并退出)
+						  4.查看tomcat服务器的log信息： 进入logs目录  cat catalina.out
+						  5.查看哪个程序占用了端口号：  进入bin目录   lsof(list open files) -i:当前tomcat端口号   
+						  6.查看占用具体信息            ps axu | grep 6190（6190是lsof -i:8080查询而来）
+http://192.168.3.128:8080/(192.168.3.128是自己Linux服务器的IP,可以用ifconfig命令查询；8080是tomcat的服务器，如果端口号占用可以用第5,6,2,1步先关再开)
+如果tomcat连接不上，可以先关闭防火墙 service iptables stop
+弹出界面eth0：错误：激活连接失败——>解决方案：windows控制台，cmd,输入services.msc,开启VMware NAT Service和VMware DHCP Service服务
+
+***tomcat***
+
+
+
+***redis***
+
+redis:remote dictionary server
+解压文件： tar -zxvf 
+安装redis的时候,make时会报gcc错误，因此要下载gcc：yum install gcc-c++ 
+安装文件：先要下载C程序的编译工具 yum install gcc-c++(gcc -v) 然后make distclean清理东西后再make 最后make install
+
+cd /usr/local/bin
+redis-server /test/downloads/redis.conf   开启服务端
+redis-cli -p 6379                         开启客户端
+ping             
+ps -ef | grep redis                       查看进程
+shutdown
+
+select 7     选择数据库，总共16个数据库，【0,15】
+keys *       查看所有键  keys k???
+dbsize       键数量
+flushdb 	 清空当前数据库所有键
+flushall	 清空16个数据库所有键
+exists key1  判断键是否存在
+expire key1  给键设置过期时间
+ttl  key1     (time to leave -1表示永不过期，-2表示已过期) 查看还有多少秒过期
+type key1    查看键的类型
+move key1 db (哪个数据库，16个中的一个)  把key1移动到其他数据库，当前数据库被移除
+del  key1     删除键
+
+分布式：不同的多台服务器上部署不同的服务模块（工程），他们之间通过RPC之间通信和调用
+集群：不同的多台服务器上部署相同的服务模块，他们之间通过分布式调度软件进行统一的调度
+
+security: config get requirepass
+          config set requirepass 123456 设置密码为123456
+
+Redis Persistence：rdb/aof可以同时存在，当redis服务启动时先加载的是aof配置文件,aof优先级大于rdb
+
+rdb:在指定的时间间隔内将内存中的数据集快照写入磁盘，也就是snapshot快照，它恢复时将快照文件
+直接读到内存中。原理是fork出一条子进程，并没有对宿主文件进行操作。文件格式：dump.rdb
+
+redis会单独fork出一个子进程来进行持久化，会先将数据写入到一个临时文件中，待持久化过程都结束了，再用这个临时文件替换上次持久化
+好的文件。整个过程中宿主进程是不进行任何IO操作的，这就确保了极高的性能。
+
+rdb文件内存清除策略：
+
+	# MAXMEMORY POLICY:You can select among five behaviors:
+	# volatile-lru -> Evict using approximated LRU among the keys with an expire set.使用LRU算法移除key，只对设置了过期时间的key；
+	# allkeys-lru -> Evict any key using approximated LRU.使用LRU算法移除key，作用对象所有key；
+	# volatile-lfu -> Evict using approximated LFU among the keys with an expire set.使用LFU算法移除key，只对设置了过期时间的key；
+	# allkeys-lfu -> Evict any key using approximated LFU.使用LFU算法移除key，作用对象所有key；
+	# volatile-random -> Remove a random key among the ones with an expire set.在过期集合key中随机移除key，只对设置了过期时间的key;
+	# allkeys-random -> Remove a random key, any key.随机移除key，作用对象为所有key；
+	# volatile-ttl -> Remove the key with the nearest expire time (minor TTL).移除ttl值最小即最近要过期的key；
+	# noeviction -> Don't evict anything, just return an error on write operations.永不过期，针对写操作，会返回错误信息。
+
+	# LRU means Least Recently   Used 最近最少使用（按时间）
+	# LFU means Least Frequently Used 最近不经常使用的（按频次）
+
+aof:以日志的形式来记录每个写操作，将redis执行过的所有写操作记录下来，只许追加文件但不可以改写
+文件，redis启动之初会读取该文件重新构建数据，换言之，redis重启的时候会根据日志文件的内容将写
+指令从前到后执行一次已完成数据的恢复工作。文件格式：appendonly.aof
+
+
+redis-check-aof --fix appendonly.aof   当因为aof文件的问题redis服务启动不起来时，修正aof文件
+redis-check-rdb dump.rdb
+aof文件保存策略：默认使用ererysec
+	appendfsync always 同步持久化，性能差但数据完整性好
+	appendfsync everysec 每秒记录，如果一秒内宕机，这一秒的数据丢失
+	appendfsync no 不保存aof文件
+	
+aof rewrite:aof采用文件追加方式，文件会越来越大，为了避免这种情况，新增了重写机制，当aof文件的大小
+超过所设定的阈值时，redis就会启动aof文件的内容压缩，只保留可以恢复数据的最小指令集，可以使用命令
+bgrewriteaof。原理是fork出一条子进程，并没有对宿主文件进行操作。触发机制：redis会记录上次重写aof文件
+的大小，默认配置是当前写入aof文件大小是上次重写时文件大小的100%时，且文件大于64M时触发。
+比如：上次重写时aof文件大小是100M，如果当前aof文件新增大小为100M，即当前aof文件大小是200M时触发rewrite机制
+
+redis transactions:
+悲观锁：行锁，在后面加version 乐观锁：表锁
+discard 取消事务
+multi   开启事务
+exec    执行事务
+watch   监控一个或多个键
+unwatch 取消所有监控
+
+redis 消息订阅（sub）与发布（pub）:
+先订阅再发送：subscribe 订阅的频道           publish 发布的频道   消息
+psubscribe new*  订阅以new开头的频道         publish new1 hello-redis
+
+redis replication:
+1.配从不配主
+2.从库配置 slaveof 主库ip 主库port（每次与master断开之后都需要重新连接，除非配置进redis.conf文件）
+3.修改redis.conf文件：拷贝多个redis.conf文件（自己根据情况命名）、开启daemonize yes、pid文件名字、指定端口、log文件名字、dump.rdb文件名字
+info replication 查看主从状态
+4.常用三招：一主二仆：master挂了之后，slave原地待命，slave挂了之后重新连接会变为master
+            薪火相传：6379是master,6380，6381是slave,6380是6381的master
+            反客为主: 当6379挂了之后，6380使用slave no one反客为主变为master，6381原地待命，也可以跟着6380
+5.复制原理：先全量复制再增量复制
+6.哨兵模式（sentinel）：反客为主的自动版，当6379挂了之后，不用手动对6380或者6381进行slaveof no one命令，而是自动的对6380和6381投票选出一个master，
+当6379重新启动之后，会成为slave
+在自定义的/test/downloads/目录下，新建sentinel.conf文件，
+编辑内容为：sentinel monitor host6379（被监控的主机名） 127.0.0.1（主机ip） 6379（主机端口） 1（如果从机票数多于1票，则推举该从机为主机）
+redis-sentinel /test/downloads/sentinel.conf
+7.缺点：先在master进行写操作，然后同步到slave，同步的时候会有些延迟，slave机器的增加也会使这个问题更加严重。
+
+***redis***
+
+
+
+***zookeeper***
+
+zookeeper=文件系统+通知机制
+zookeeper特点：1.一个leader，多个follower
+			   2.集群中只要有半数以上的node存活，zookeeper集群就能正常服务
+			   3.全局数据一致:每个server保存一份相同的数据副本，client无论连接到哪个server，数据都是一致的
+			   4.更新请求顺序执行，多个请求按照顺序一个一个执行
+			   5.数据更新原子性，一次数据更新要么成功，要么失败
+			   6.实时性，在一定时间范围内，client能读到最新数据
+zookeeper数据结构：类似于linux、unix、hdfs的树结构目录，每个节点称为一个znode,默认存储1MB的数据
+
+
+1．集群规划
+在hadoop102、hadoop103和hadoop104三个节点上部署Zookeeper。
+2．解压安装
+（1）解压Zookeeper安装包到/opt/module/目录下
+[atguigu@hadoop102 software]$ tar -zxvf zookeeper-3.4.10.tar.gz -C /opt/module/
+（2）同步/opt/module/zookeeper-3.4.10目录内容到hadoop103、hadoop104
+[atguigu@hadoop102 module]$ xsync zookeeper-3.4.10/
+3．配置服务器编号
+（1）在/opt/module/zookeeper-3.4.10/这个目录下创建zkData
+[atguigu@hadoop102 zookeeper-3.4.10]$ mkdir -p zkData
+（2）在/opt/module/zookeeper-3.4.10/zkData目录下创建一个myid的文件
+[atguigu@hadoop102 zkData]$ touch myid
+添加myid文件，注意一定要在linux里面创建，在notepad++里面很可能乱码
+（3）编辑myid文件
+[atguigu@hadoop102 zkData]$ vi myid
+在文件中添加与server对应的编号：2
+（4）拷贝配置好的zookeeper到其他机器上
+[atguigu@hadoop102 zookeeper-3.4.10]$ xsync myid
+并分别在hadoop102、hadoop103上修改myid文件中内容为3、4
+4．配置zoo.cfg文件
+（1）重命名/opt/module/zookeeper-3.4.10/conf这个目录下的zoo_sample.cfg为zoo.cfg
+[atguigu@hadoop102 conf]$ mv zoo_sample.cfg zoo.cfg
+（2）打开zoo.cfg文件
+[atguigu@hadoop102 conf]$ vim zoo.cfg
+修改数据存储路径配置
+dataDir=/opt/module/zookeeper-3.4.10/zkData
+增加如下配置
+#######################cluster##########################
+server.2=hadoop102:2888:3888
+server.3=hadoop103:2888:3888
+server.4=hadoop104:2888:3888
+（3）同步zoo.cfg配置文件
+[atguigu@hadoop102 conf]$ xsync zoo.cfg
+（4）配置参数解读
+server.A=B:C:D。[A:第几号服务器,B:服务器的ip地址,C:LF通信端口,D:LF选举的端口]
+
+
+zookeeper监听器的原理？
+zookeeper选举机制？
+查看zookeeper版本号：echo stat|nc ip 2181
+
+
+
+进入/home/用户/bin目录新建zkStart.sh、zkStatus.sh、zkStop.sh、util.sh文件，更改权限： chomd 777 zkStart.sh[zkStatus.sh|zkStop.sh|util.sh];
+#zookeeper集群启动脚本
+#!/bin/bash
+
+echo "start zookeeper servers..."
+
+hosts="hadoop101 hadoop102 hadoop103"
+
+for host in $hosts
+do
+    echo "==========      root@$host      =========="
+    ssh $host "source /etc/profile;/opt/module/zookeeper-3.4.10/bin/zkServer.sh start"
+done
+
+
+#zookeeper集群状态脚本
+#!/bin/bash 
+
+hosts="hadoop101 hadoop102 hadoop103"
+
+for host in $hosts
+do
+     echo "==========      root@$host      =========="
+     ssh $host "source /etc/profile;/opt/module/zookeeper-3.4.10/bin/zkServer.sh status"
+done
+
+
+#zookeeper集群关闭脚本
+#!/bin/bash
+
+echo "stop zookeeper servers..."
+
+hosts="hadoop101 hadoop102 hadoop103"
+
+for host in $hosts
+do
+    echo "==========      root@$host      =========="
+    ssh $host "source /etc/profile;/opt/module/zookeeper-3.4.10/bin/zkServer.sh stop"
+done
+
+#zookeeper集群jps
+#!/bin/bash
+
+hosts="hadoop110 hadoop111 hadoop112"
+
+for host in $hosts
+do
+    echo "==========      pig@$host      =========="
+    ssh $host "source /etc/profile;jps"
+done
+
+***zookeeper***
+
+
+***nginx***
+
+1.nginx基本概念、linux安装、常用命令、配置文件
+nginx是一个高性能的HTTP和反向代理服务器，占有内存少，并发能力强
+安装依赖pcre/zlib/gcc/openssl
+pcre安装：进入/usr/src目录 wget http://downloads.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz
+          wget方式下载较慢，可以直接进downloads.sourceforge.net官网搜索pcre进行下载
+          tar -zxvf pcre-8.37.tar.gz 解压完成后，进入pcre目录执行./configure,然后执行make && make install
+		  pcre-config --version查看版本
+安装其他依赖：yum -y make install zlib zlib-devel gcc-c++ libtool openssl openssl-devel
+安装 nginx
+		   1、 解压缩 nginx-xx.tar.gz 包。
+		   2、 进入解压缩目录，执行./configure。
+		   3、 make && make install
+		   安装成功后，在/usr/local会多出nginx文件夹
+常用命令：进入/usr/local/nginx/sbin  ./nginx    ./nginx -v   ./nginx -s stop  ./nginx -s reload(重新加载配置文件，让配置文件生效)
+
+2.nginx配置实例-反向代理
+正向代理：在浏览器中配置代理服务器，由代理服务器去访问网址
+反向代理：客户端不需要任何配置就可以访问，我们只需要将请求发送到反向代理服务器，
+          由反向代理服务器去选择目标服务器（访问tomcat）获取数据后，在返回给客户端，此时
+          反向代理服务器和目标服务器对外就是一个服务器，暴露的是代理服务器的地址，隐藏了真实服务器的IP地址。
+
+
+3.nginx配置实例-负载均衡
+将客户端请求（负载）分发到多个服务器（集群），每个服务器一个tomcat
+nginx 分配服务器策略:在upstream myserver中配置
+第一种 轮询（默认）
+每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器 down 掉，能自动剔除。
+第二种 weight
+weight 代表权重默认为 1,权重越高被分配的客户端越多
+第三种 ip_hash
+每个请求按访问 ip 的 hash 结果分配，这样每个访客固定访问一个后端服务器
+第四种 fair（第三方）
+按后端服务器的响应时间来分配请求，响应时间短的优先分配。
+
+
+4.nginx配置实例-动静分离
+为了加快网站的解析速度，可以把动态页面（jsp/servlet）和静态页面（html/css/js）由不同的服务器来解析，降低原来单个服务器的压力
+实质是把动态请求和静态请求分开，动态请求tomcat，静态请求静态资源服务器
+
+
+5.nginx配置高可用集群
+
+
+
+***nginx***
+
+
+***kafka***
+
+修改配置文件
+[atguigu@hadoop102 kafka]$ cd config/
+[atguigu@hadoop102 config]$ vi server.properties
+输入以下内容：
+#broker的全局唯一编号，不能重复
+broker.id=0
+#删除topic功能使能
+delete.topic.enable=true
+#处理网络请求的线程数量
+num.network.threads=3
+#用来处理磁盘IO的现成数量
+num.io.threads=8
+#发送套接字的缓冲区大小
+socket.send.buffer.bytes=102400
+#接收套接字的缓冲区大小
+socket.receive.buffer.bytes=102400
+#请求套接字的缓冲区大小
+socket.request.max.bytes=104857600
+#kafka运行日志存放的路径	
+log.dirs=/opt/module/kafka/logs
+#topic在当前broker上的分区个数
+num.partitions=1
+#用来恢复和清理data下数据的线程数量
+num.recovery.threads.per.data.dir=1
+#segment文件保留的最长时间，超时将被删除
+log.retention.hours=168
+#配置连接Zookeeper集群地址
+zookeeper.connect=hadoop110:2181,hadoop111:2181,hadoop112:2181
+
+
+#kafka集群启动脚本
+#!/bin/bash
+echo "starting kafka servers..."
+
+hosts="hadoop101 hadoop102 hadoop103"
+
+for host in $hosts
+do
+    echo "==========      root@$host      =========="
+    echo "正在启动$host"
+    ssh $host "source /etc/profile;/opt/module/kafka/bin/kafka-server-start.sh -daemon /opt/module/kafka/config/server.properties"
+done
+
+#kafka集群关闭脚本
+#!/bin/bash
+echo "stoppint kafka servers..."
+
+hosts="hadoop101 hadoop102 hadoop103"
+
+for host in $hosts
+do
+    echo "==========      root@$host      =========="
+    echo "正在关闭$host"
+    ssh $host "source /etc/profile;/opt/module/kafka/bin/kafka-server-stop.sh"
+done
+
+***kafka***
+
+***hadoop***
+
+------------------------------------------------------------------------------------------------------
+#xsync集群分发脚本
+#!/bin/bash
+#1 获取输入参数个数，如果没有参数，直接退出
+pcount=$#
+if((pcount==0)); then
+echo no args;
+exit;
+fi
+
+#2 获取文件名称
+p1=$1
+fname=`basename $p1`
+echo fname=$fname
+
+#3 获取上级目录到绝对路径
+pdir=`cd -P $(dirname $p1); pwd`
+echo pdir=$pdir
+
+#4 获取当前用户名称
+user=`whoami`
+
+#5 循环
+for((host=102; host<104; host++)); do
+        echo ------------------- hadoop$host --------------
+        rsync -rvl $pdir/$fname $user@hadoop$host:$pdir
+done
+-------------------------------------------------------------------------------------------------------
+#startcluster.sh集群启动脚本
+#!/bin/bash
+echo "==========     开始开启所有节点服务       =========="
+
+echo "==========     正在启动Zookeeper          =========="
+hosts="hadoop101 hadoop102 hadoop103"
+for host in $hosts
+do
+    ssh $host "source /etc/profile;/opt/module/zookeeper-3.4.10/bin/zkServer.sh start"
+done
+
+echo "==========     正在启动HDFS               =========="
+ssh hadoop101 "/opt/module/hadoop-2.7.2/sbin/start-dfs.sh"
+
+echo "==========     正在启动YARN               =========="
+ssh hadoop102 "/opt/module/hadoop-2.7.2/sbin/start-yarn.sh"
+
+echo "==========     正在启动JobHistoryServer   =========="
+ssh hadoop103  "/opt/module/hadoop-2.7.2/sbin/mr-jobhistory-daemon.sh start historyserver"
+
+
+-------------------------------------------------------------------------------------------------------
+#stopcluster.sh集群关闭脚本
+#!/bin/bash
+echo "==========     开始关闭所有节点服务       =========="
+
+echo "==========     正在关闭Zookeeper          =========="
+hosts="hadoop101 hadoop102 hadoop103"
+for host in $hosts
+do
+    ssh $host "source /etc/profile;/opt/module/zookeeper-3.4.10/bin/zkServer.sh stop"
+done
+
+echo "==========     正在关闭HDFS               =========="
+ssh hadoop101 "/opt/module/hadoop-2.7.2/sbin/stop-dfs.sh"
+
+echo "==========     正在关闭YARN               =========="
+ssh hadoop102 "/opt/module/hadoop-2.7.2/sbin/stop-yarn.sh"
+
+echo "==========     正在关闭JobHistoryServer   =========="
+ssh hadoop103  "/opt/module/hadoop-2.7.2/sbin/mr-jobhistory-daemon.sh stop historyserver"
+
+--------------------------------------------------------------------------------------------------------
+#kafka集群启动脚本
+#!/bin/bash
+echo "==========     开始启动Kafka       =========="
+hosts="hadoop101 hadoop102 hadoop103"
+for host in $hosts
+do
+    echo "------   $host------   "
+    ssh $host "source /etc/profile;/opt/module/kafka_2.11-0.11.0.2/bin/kafka-server-start.sh -daemon /opt/module/kafka_2.11-0.11.0.2/config/server.properties"
+done
+
+
+#kafka集群关闭脚本
+#!/bin/bash
+echo "==========     开始关闭Kafka       =========="
+hosts="hadoop101 hadoop102 hadoop103"
+for host in $hosts
+do
+    echo "------   $host------   "
+    ssh $host "source /etc/profile;/opt/module/kafka_2.11-0.11.0.2/bin/kafka-server-stop.sh"
+done
+--------------------------------------------------------------------------------------------------------
+#util.sh显示jps
+#!/bin/bash
+
+hosts="hadoop101 hadoop102 hadoop103"
+for host in $hosts
+do
+    echo "==========     $host     =========="
+    ssh $host "source /etc/profile;jps"
+done
+
+
+hdfs-site.xml
+
+dfs.namenode.checkpoint.period:3600
+dfs.namenode.checkpoint.check.txns:1000000
+dfs.namenode.checkpoint.check.period:60
+
+dfs.namenode.heartbeat.recheck-interval:300000
+dfs.heartbeat.interval:3
+
+timeOut=2*dfs.namenode.heartbeat.recheck-interval+10*dfs.heartbeat.interval=10分30秒
+
+:set mouse=r
+
+服役新数据节点
+
+服役旧数据节点：
+添加白名单：添加到白名单的主机节点，都允许访问NameNode，不在白名单的主机节点，都会被退出。
+黑名单退役：在黑名单上面的主机都会被强制退出。
+注意：不允许白名单和黑名单中同时出现同一个主机名称。
+
+节点，通俗来说就是服务器，就是电脑
+
+Hadoop 1.X 和 Hadoop 2.X的区别：
+	1主要有hdfs、mapreduce、common，其中mapreduce负责计算和资源调度，2主要有hdfs、mapreduce、yarn、common
+	mapreduce负责计算，yarn负责资源调度，是对1版本的解耦，降低耦合度。
+	
+yarn架构：
+	ResourceManager的作用：
+		1.处理客户端请求
+		2.监控NodeManager状态
+		3.启动或监控ApplicationMaster，这里面可以管理job，ApplicationMaster存在于NodeManager中
+		4.资源的分配与调度：内存、cpu、磁盘等的分配与调度
+	NodeManager的作用：
+		1.管理单个节点上的资源、
+		2.处理来自于ResourceManager的命令
+		3.处理来自于ApUANplicationMaster的命令
+	ApplicationMaster的作用：
+		1.负责数据的切分
+		2.为应用程序申请资源并分配给内部的任务
+		3.任务的监控与容错
+	container的作用：
+		是yarn中的资源抽象，封装了节点上的多维度资源，如内存、cpu、磁盘、网络等
+		
+hdfs:
+	namenode:存储文件的元数据，如文件名，文件目录结构，文件属性（生成时间、副本数、文件权限），以及每个文件的块列表和块所在的datanode
+	datanode:在本地文件存储系统文件块数据，以及块数据的校验和	
+	secondary namenode:用来监控hdfs状态的辅助后台程序，每隔一段时间获取hdfs元数据的快照
+
+mapreduce:
+	map:分，并行处理输入数据
+	reduce:合，对map结果进行汇总
+	
+wordcount案例准备工作：
+eclipse安装及编码格式设置：
+	1、设置工作空间编码格式：在Window--》Preferences--》General--》Workspace下，面板Text file encoding 选择UTF-8格式
+	2、设置JSP页面编码格式：在Window--》Preferences--》Web--》JSP Files 面板选择 ISO 10646/Unicode(UTF-8)格式编码
+	3、设置文档编码格式：在Window--》Preferences--》General --》Content Type--》Text的最下面设置为编码格式为UTF-8
+	4、设置项目的文档编码格式：选择项目--》右键--》Properties --》Resource 设置编码为UTF-8格式
+
+maven安装及设置和eclipse配置：
+	maven环境变量配置
+	setting.xml配置：
+		1.新建本地库<localRepository>F:\study\repository</localRepository>
+		2.阿里云镜像
+		  <mirror>
+		    <id>aliyunmaven</id>
+		    <mirrorOf>central</mirrorOf>
+		    <name>阿里云公共仓库</name>
+		    <url>https://maven.aliyun.com/repository/central</url>
+    	  </mirror>
+    	3.<profile>
+		      <id>jdk-1.8</id>
+		      <activation>
+		      <activeByDefault>true</activeByDefault>
+		      <jdk>1.8</jdk>
+		      </activation>
+		      <properties>
+		      <maven.compiler.source>1.8</maven.compiler.source>
+		      <maven.compiler.target>1.8</maven.compiler.target>
+		      <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+		      </properties>
+   		  </profile>
+
+   	eclipse中：在Window--》Preferences--》Maven--》Installations/User Settings
+   			   	Installations-->Add-->Directory中加入maven根路径
+   			   	User Setting-->Global Settings中加入settings.xml路径
+
+win7下hadoop安装：1.配置环境变量，前提是必须要有jdk(java -version)，如果jdk环境变量路径下有空格，会报错
+				 2.配置hadoop-env.cmd文件，修改JAVA_HOME
+                   则set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_181会报错，因为有空格
+                   可以set JAVA_HOME=C:\PROGRA~1\Java\jdk1.8.0_181，设置成功后cmd输入hadoop version看是否正常显示版本信息
+	
+	
+	
+
+hadoop fs使用范围广，可以操作任何文件系统
+hadoop dfs和hdfs dfs只能操作HDFS和本地文件系统，前者已经过时，推荐使用hdfs dfs	
+hdfs命令：
+  dfs                  run a filesystem command on the file systems supported in Hadoop.
+  namenode -format     format the DFS filesystem
+  secondarynamenode    run the DFS secondary namenode
+  namenode             run the DFS namenode
+  journalnode          run the DFS journalnode
+  zkfc                 run the ZK Failover Controller daemon
+  datanode             run a DFS datanode
+  dfsadmin             run a DFS admin client
+  diskbalancer         Distributes data evenly among disks on a given node
+  haadmin              run a DFS HA admin client
+  fsck                 run a DFS filesystem checking utility
+  balancer             run a cluster balancing utility
+  jmxget               get JMX exported values from NameNode or DataNode.
+  mover                run a utility to move block replicas across
+                       storage types
+  oiv                  apply the offline fsimage viewer to an fsimage
+  oiv_legacy           apply the offline fsimage viewer to an legacy fsimage
+  oev                  apply the offline edits viewer to an edits file
+  fetchdt              fetch a delegation token from the NameNode
+  getconf              get config values from configuration
+  groups               get the groups which users belong to
+  snapshotDiff         diff two snapshots of a directory or diff the
+                       current directory contents with a snapshot
+  lsSnapshottableDir   list all snapshottable dirs owned by the current user
+						Use -help to see options
+  portmap              run a portmap service
+  nfs3                 run an NFS version 3 gateway
+  cacheadmin           configure the HDFS cache
+  crypto               configure HDFS encryption zones
+  storagepolicies      list/get/set block storage policies
+  version              print the version
+  
+  
+   1.scp（secure copy）安全拷贝:可以实现服务器与服务器之间的数据拷贝
+   在hadoop103上操作将hadoop101中/opt/module目录下的软件拷贝到hadoop104上。
+   [pig@hadoop103 opt]$ scp -r pig@hadoop101:/opt/module root@hadoop104:/opt/module
+   
+   2.rsync 远程同步工具:rsync和scp区别：用rsync做文件的复制要比scp的速度快，rsync只对差异文件做更新。scp是把所有文件都复制过去。
+   把hadoop101机器上的/opt/software目录同步到hadoop102服务器的root用户下的/opt/目录
+   [pig@hadoop101 opt]$ rsync -rvl /opt/software/ root@hadoop102:/opt/software
+   
+   3.xsync集群分发脚本:在家目录的bin目录下创建xsync文件并写入脚本，然后修改文件权限
+   （a）在家目录/home/pig下创建bin目录，并在bin目录下xsync创建文件，文件内容如下：
+	[pig@hadoop102 ~]$ mkdir bin
+	[pig@hadoop102 ~]$ cd bin/
+	[pig@hadoop102 bin]$ touch xsync
+	[pig@hadoop102 bin]$ vi xsync
+	
+	在该文件中编写如下代码
+	#!/bin/bash
+	#1 获取输入参数个数，如果没有参数，直接退出
+	pcount=$#
+	if((pcount==0)); then
+	echo no args;
+	exit;
+	fi
+
+	#2 获取文件名称
+	p1=$1
+	fname=`basename $p1`
+	echo fname=$fname
+
+	#3 获取上级目录到绝对路径
+	pdir=`cd -P $(dirname $p1); pwd`
+	echo pdir=$pdir
+
+	#4 获取当前用户名称
+	user=`whoami`
+
+	#5 循环
+	for((host=111; host<113; host++)); do
+			echo ------------------- hadoop$host --------------
+			rsync -rvl $pdir/$fname $user@hadoop$host:$pdir
+	done
+	（b）修改脚本 xsync 具有执行权限
+	[pig@hadoop102 bin]$ chmod 777 xsync
+	（c）调用脚本形式：xsync 文件名称
+	[pig@hadoop102 bin]$ xsync /home/pig/bin
+	注意：如果将xsync放到/home/pig/bin目录下仍然不能实现全局使用，可以将xsync移动到/usr/local/bin目录下。
+	
+	
+	1.生成公钥和私钥：ssh-keygen命令用于为“ssh”生成、管理和转换认证密钥，它支持RSA和DSA两种认证密钥。-t指定要创建的密钥类型。
+	[pig@hadoop102 .ssh]$ ssh-keygen -t rsa
+	然后敲（三个回车），就会生成两个文件id_rsa（私钥）、id_rsa.pub（公钥）
+	
+	2.将公钥拷贝到要免密登录的目标机器上:先cd进入家目录，然后cd .ssh 
+	[pig@hadoop102 .ssh]$ ssh-copy-id hadoop102
+	[pig@hadoop102 .ssh]$ ssh-copy-id hadoop103
+	[pig@hadoop102 .ssh]$ ssh-copy-id hadoop104
+	注意：
+	还需要在hadoop102上采用root账号，配置一下无密登录到hadoop102、hadoop103、hadoop104；
+	还需要在hadoop103上采用pig账号配置一下无密登录到hadoop102、hadoop103、hadoop104服务器上。
+	
+	3.	.ssh文件夹下（~/.ssh）的文件功能解释
+	known_hosts	    记录ssh访问过计算机的公钥(public key)
+	id_rsa	        生成的私钥
+	id_rsa.pub	    生成的公钥
+	authorized_keys	存放授权过得无密登录服务器公钥
+
+	
+***hadoop***
+
+
+***hbase***
+
+1.HBase-->HDFS
+hbase org.apache.hadoop.hbase.mapreduce.Export 表名 新建HDFS路径
+2.HDFS-->Linux
+hadoop dfs -get HDFS路径 Linux路径
+3.查表结构
+describe '文件名'               //内网:hbase shell
+4.从Linux路径把文件拖到本地，用U盘拷贝到自己电脑
+
+
+1.把文件拖到Linux的/home/avator/sheduler路径下
+2.Linux-->HDFS
+hadoop dfs -put Linux路径 HDFS路径
+3.建表
+create '文件名',列族信息，需要name和versions,如：create 'WQX_KKM',{NAME => '201901', VERSIONS => '1'},{NAME => 'timestamp', VERSIONS => '1'} 
+4.HDFS-->HBase
+hbase org.apache.hadoop.hbase.mapreduce.Import 文件名 HDFS路径 
+
+
+
+查询某个时间段的某个测点值
+get "sngs","1027116",{FILTER=>"ColumnPrefixFilter('17') AND FamilyFilter(=,'substring:201904')"}  TIMERANGE=>[1554096708577,1554128182162]
+查询某一刻的所有测点值
+scan 'sngs',{FILTER=>"ColumnPrefixFilter('01') AND FamilyFilter(=,'substring:201906')"}  TIMESTAMP=>1553066643923
+
+
+
+> scan 'testByCrq', FILTER=>"RowFilter(=,'substring:111')"
+1
+如上命令所示，查询的是表名为testByCrq，过滤方式是通过rowkey过滤，匹配出rowkey含111的数据。
+
+> scan 'testByCrq', FILTER=>"RowFilter(=,'binary:0111486816556')"
+1
+如上命令所示，查询的是表名为testByCrq，过滤方式是通过rowkey过滤，匹配出rowkey等于0111486816556的数据。
+
+> scan 'testByCrq', FILTER=>"RowFilter(<=,'binary:0111486816556')"
+1
+如上命令所示，查询的是表名为testByCrq，过滤方式是通过rowkey过滤，匹配出rowkey小于等于0111486816556的数据。
+
+> scan 'testByCrq', FILTER=>"ValueFilter(=,'substring:111')"
+1
+如上命令所示，查询的是表名为testByCrq，过滤方式是通过value过滤，匹配出value含111的数据。
+
+> scan 'testByCrq', FILTER=>"FamilyFilter(=,'substring:f')"
+1
+如上命令所示，查询的是表名为testByCrq，过滤方式是通过列簇过滤，匹配出列簇含f的数据。 
+注：substring不能使用小于等于等符号。
+
+> scan 'testByCrq', FILTER=>"PrefixFilter('00000')"
+1
+如上命令所示，查询的是表名为testByCrq，过滤方式是通过前缀过滤过滤的是行键，匹配出前缀为00000的数据。
+
+
+hive导出到本地Linux(必须要进入hive shell命令)：
+insert overwrite local directory '/tmp/hive/' row format delimited fields terminated by ',' select * from hdr_analog;
+插入覆盖到本地目录/tmp/hive/,以“，”结尾的行格式行格式分隔字段
+
+cat /tmp/hive/000000_0
+hive导出到HDFS:
+insert overwrite directory '/tmp/hive/' select * from hdr_analog;  
+./hadoop fs -cat /tmp/hive/000000_0
+
+
+hbase org.apache.hadoop.hbase.mapreduce.Export sngs /avatar/hbase/sngs0313 1 1552233600000 1552320000000     
+hadoop dfs -get /avatar/hbase/sngs0313 /home/hbase/sngs0313
+
+
+
+sngs_HbaseToHDFS.sh
+#!/bin/bash
+#获得昨天日期和开始时间戳(昨天0时0分0秒)
+date_yesterday=$(date -d "-1 day" +%m%d)
+yesterdayTimeStamp=$(date -d "2019$date_yesterday 00:00:00" +%s)
+#获得当天日期和结束时间戳(昨天23时59分59秒，也即当天0时0分0秒)
+date_today=$(date +%m%d)
+todayTimeStamp=$(date -d "2019$date_today 00:00:00" +%s)
+#从Hbase导入HDFS中
+/opt/cloudera/parcels/CDH-5.15.1-1.cdh5.15.1.p0.4/bin/hbase org.apache.hadoop.hbase.mapreduce.Export sngs /avatar/hbase/sngs$date_yesterday 1 $yesterdayTimeStamp"000" $todayTimeStamp"000"
+
+
+sngs_HDFSToLocal.sh
+#!/bin/bash
+#获得昨天日期
+date_yesterday=$(date -d "-1 day" +%m%d)
+#从HDFS导入本地中
+/opt/cloudera/parcels/CDH-5.15.1-1.cdh5.15.1.p0.4/bin/hdfs dfs -get /avatar/hbase/sngs$date_yesterday /home/sngs/sngs$date_yesterday
+
+
+
+
+
+#修改文件权限
+chmod 777 sngs_HbaseToHDFS.sh
+chmod 777 sngs_HDFSToLocal.sh	
+	
+0 1 * * * /home/tshell/sngs_HbaseToHDFS.sh
+0 6 * * * /home/tshell/sngs_HDFSToLocal.sh
+
+***hbase***
+
+
+
+
+***mysql日期函数***
+
+1.str_to_date()函数：按照指定日期或时间显示格式 将字符串转换为日期或日期时间类型；str_to_date(datestring，format)
+
+2.date_format()函数：按照指定日期或时间显示格式 输出日期或日期时间；date_format(datestring，format)
+
+3.date_sub() date_add()函数从日期减去/增加指定的时间间隔。date_sub(date,interval expr type)
+
+4.last_day(now())当月最后一天
+
+5.date_sub(date_add(last_day(now()),interval 1 day),interval 1 month)当月第一天 
+  date_add(curdate(),interval -day(curdate())+1 day)当月第一天 
+
+6.extract(unit from date)  用于返回日期/时间的单独部分，比如年、月、日、小时、分钟等等。extract(year from now())
+
+7.year(now()) month() day() hour() minute() second()   返回给定日期/时间的年、月、日、时、分、秒
+
+
+上月26号到当月25号
+select *,str_to_date(date_time,'%Y-%m-%d') date_day from kpi_result_sq_production where str_to_date(date_time,'%Y-%m-%d')>=subdate(date_sub(curdate(),interval 1 month), date_format(date_sub(curdate(),interval 1 month),'%e')-26) and str_to_date(date_time,'%Y-%m-%d') <= date_sub(date_format(now(),'%y-%m-%d'),interval extract( day from now())-25 day)
+
+当月第一天到当月最后一天
+select *,str_to_date(date_time,'%Y-%m-%d') date_day from kpi_result_sq_production where str_to_date(date_time,'%Y-%m-%d') >= date_sub(date_add(last_day(now()),interval 1 day),interval 1 month) and str_to_date(date_time,'%Y-%m-%d') <= last_day(now())
+
+***mysql日期函数***
+
+
+
+
+
+Linux（date命令）、Mysql（date函数）、java（date类）
+
+Linux：date -d <+时间日期格式>  
+date -d "1 day ago" +"%Y-%m-%d %H:%M:%S"
+date +%Y%m%d                   //显示当天年月日
+date -d "-1 day" +%Y%m%d       //显示前一天的日期
+date -d "+1 day" +%Y%m%d       //显示后一天的日期
+date -d "-1 month" +%Y%m%d     //显示上一月的日期
+date -d "+1 month" +%Y%m%d     //显示下一月的日期
+date -d "-1 year" +%Y%m%d      //显示前一年的日期
+date -d "+1 year" +%Y%m%d      //显示下一年的日期
+
+Mysql（date函数）
+date_format(now(),'%Y-%m-%d %H:%i:%S')
+
+java（date类）
+Date date = new Date(); //获取当前的系统时间。
+SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss") ; //使用了默认的格式创建了一个日期格式化对象。
+String time = dateFormat.format(date); //可以把日期转换转指定格式的字符串
+
+
+
+hadoop集群版本号：          最新版本
+hadoop:2.6.0                3.X                   Hadoop version
+zookeeper:3.4.5             3.X                   echo stat|nc ip 2181
+hbase:1.2.0                 2.X                   hbase shell
+hive:1.1.0                  3.X                   hive shell
+kafka:1.0.1                                       2.11-1.0.1 
+scala:2.11.8                                      通过spark-shell命令可以查看spark和scala版本号
+
+
+组件	版本	发行版	CDH 版本
+Supervisord	3.0-cm5.15.1	不可用	不适用
+Bigtop-Tomcat（仅限 CDH 5）	0.7.0+cdh5.15.1+0	1.cdh5.15.1.p0.4	CDH 5.15.1
+Cloudera Manager Agent	5.15.1	1.cm5151.p0.3.el7	不适用
+Cloudera Manager Management Daemon	5.15.1	1.cm5151.p0.3	不适用
+Crunch（仅限 CDH 5 ）	0.11.0+cdh5.15.1+104	1.cdh5.15.1.p0.4	CDH 5.15.1
+Flume NG	1.6.0+cdh5.15.1+189	1.cdh5.15.1.p0.4	CDH 5.15.1
+Hadoop	2.6.0+cdh5.15.1+2822	1.cdh5.15.1.p0.4	CDH 5.15.1
+MapReduce 1	2.6.0+cdh5.15.1+2822	1.cdh5.15.1.p0.4	CDH 5.15.1
+HDFS	2.6.0+cdh5.15.1+2822	1.cdh5.15.1.p0.4	CDH 5.15.1
+HttpFS	2.6.0+cdh5.15.1+2822	1.cdh5.15.1.p0.4	CDH 5.15.1
+hadoop-kms	2.6.0+cdh5.15.1+2822	1.cdh5.15.1.p0.4	CDH 5.15.1
+MapReduce 2	2.6.0+cdh5.15.1+2822	1.cdh5.15.1.p0.4	CDH 5.15.1
+YARN	2.6.0+cdh5.15.1+2822	1.cdh5.15.1.p0.4	CDH 5.15.1
+HBase	1.2.0+cdh5.15.1+470	1.cdh5.15.1.p0.4	CDH 5.15.1
+Lily HBase Indexer	1.5+cdh5.15.1+74	1.cdh5.15.1.p0.4	CDH 5.15.1
+Hive	1.1.0+cdh5.15.1+1395	1.cdh5.15.1.p0.4	CDH 5.15.1
+HCatalog	1.1.0+cdh5.15.1+1395	1.cdh5.15.1.p0.4	CDH 5.15.1
+Hue	3.9.0+cdh5.15.1+8420	1.cdh5.15.1.p0.4	CDH 5.15.1
+Impala	2.12.0+cdh5.15.1+0	1.cdh5.15.1.p0.4	CDH 5.15.1
+Java 8	java version "1.8.0_181"不可用	不适用
+Kafka	1.0.1+kafka3.1.0	1.3.1.0.p0.40	不适用
+Kite（仅限 CDH 5 ）	1.0.0+cdh5.15.1+147	1.cdh5.15.1.p0.4	CDH 5.15.1
+kudu	1.7.0+cdh5.15.1+0	1.cdh5.15.1.p0.4	CDH 5.15.1
+Llama（仅限 CDH 5 ）	1.0.0+cdh5.15.1+0	1.cdh5.15.1.p0.4	CDH 5.15.1
+Mahout	0.9+cdh5.15.1+36	1.cdh5.15.1.p0.4	CDH 5.15.1
+Oozie	4.1.0+cdh5.15.1+492	1.cdh5.15.1.p0.4	CDH 5.15.1
+Parquet	1.5.0+cdh5.15.1+197	1.cdh5.15.1.p0.4	CDH 5.15.1
+Pig	0.12.0+cdh5.15.1+114	1.cdh5.15.1.p0.4	CDH 5.15.1
+sentry	1.5.1+cdh5.15.1+458	1.cdh5.15.1.p0.4	CDH 5.15.1
+Solr	4.10.3+cdh5.15.1+529	1.cdh5.15.1.p0.4	CDH 5.15.1
+spark	1.6.0+cdh5.15.1+570	1.cdh5.15.1.p0.4	CDH 5.15.1
+spark2	na	na	不适用
+Sqoop	1.4.6+cdh5.15.1+136	1.cdh5.15.1.p0.4	CDH 5.15.1
+Sqoop	1.99.5+cdh5.15.1+49	1.cdh5.15.1.p0.4	CDH 5.15.1
+Whirr	0.9.0+cdh5.15.1+25	1.cdh5.15.1.p0.4	CDH 5.15.1
+ZooKeeper	3.4.5+cdh5.15.1+149	1.cdh5.15.1.p0.4	CDH 5.15.1
+
+
+spark：2.3.0
+
+常见端口汇总：
+Hadoop：    
+    50070：HDFS WEB UI端口
+    8020 ： 高可用的HDFS RPC端口
+    9000 ： 非高可用的HDFS RPC端口
+    8088 ： Yarn 的WEB UI 接口
+    8485 ： JournalNode 的RPC端口
+    8019 ： ZKFC端口
+   19888：jobhistory WEB UI端口
+Zookeeper: 
+    2181 ： 客户端连接zookeeper的端口
+    2888 ： zookeeper集群内通讯使用，Leader监听此端口
+    3888 ： zookeeper端口 用于选举leader
+Hbase:
+    60010：Hbase的master的WEB UI端口 （旧的） 新的是16010
+    60030：Hbase的regionServer的WEB UI 管理端口    
+Hive:
+    9083  :  metastore服务默认监听端口
+    10000：Hive 的JDBC端口
+Spark：
+    7077 ： spark 的master与worker进行通讯的端口  standalone集群提交Application的端口
+    8080 ： master的WEB UI端口  资源调度
+    8081 ： worker的WEB UI 端口  资源调度
+    4040 ： Driver的WEB UI 端口  任务调度
+    18080：Spark History Server的WEB UI 端口
+Kafka：
+    9092： Kafka集群节点之间通信的RPC端口
+	9090:  Kafka集群监控端口
+Redis：
+    6379： Redis服务端口
+CDH：
+    7180： Cloudera Manager WebUI端口
+    7182： Cloudera Manager Server 与 Agent 通讯端口
+HUE：
+    8888： Hue WebUI 端口
+
+
+
+excel表格根据子节点找到父节点
+
+=IF(COUNTIF(A3,"*.*"),LEFT(A3,LEN(A3)-MATCH(".",MID(A3,LEN(A3)+1-ROW(INDIRECT("1:"&LEN(A3))),1),)),A3)    Ctrl+Shift+Enter键
+
+A列           B列
+101           101
+101.1         101
+101.1.1       101.1
+101.1.1.120   101.1.1
+
+
+
+
+http://118.190.132.107:8081/nexus/content/repositories/snapshots/com/link/sn_devproject
+1，将原有的jar停止，更改start.sh脚本jar名称，在linkdata目录下运行: ./stop.sh
+2，将原有的jar删除或者备份（jar包在linkdata/lib目录下）
+3，将新版本jar拷贝至linkdata/lib目录下
+4，删除之前的启动日志：rm -rf nohup.out
+5，启动jar，运行：./start.sh（启动完后Ctl+C退出即可）
+
+
+若想看启动日志，则运行：tail -f nohup.out
+
+
+
+FTP地址
+
+
+ftp://111.204.47.160:8094
+
+账号 ftp  密码  1qaz@WSX
+
+172.16.4.21:
+
+dist备份：
+mkidr -p /opt/app/backup/20190709
+cd /opt/app
+cp avatar/ -r /opt/app/backup/20190709
+把dist(index.html和static)，CBSanalysis文件夹覆盖到/opt/app/avatar目录下
+
+/usr/local/nginx/sbin/nginx -s reload   重启服务
+
+172.16.4.13:
+
+scheduler备份：
+mkdir -p /home/backup/scheduler/20190709
+cd /home/backup/scheduler/20190417
+cp avatar -r /home/backup/scheduler/20190709
+
+启动后台前 先把采集停了  在数据采集菜单下的时序数据采集
+
+sh /home/apache-tomcat-8.5.6_scheduler/bin/shutdown.sh   kill -9  停止服务
+替换掉非application.properties文件
+sh /home/apache-tomcat-8.5.6_scheduler/bin/startup.sh                启动服务
+tail -f /home/apache-tomcat-8.5.6_scheduler/logs/avatar.log          查看日志
+
+后台启动成功  在开启采集   在数据采集菜单下的时序数据采集     
+
+avatar备份：
+mkdir -p /home/backup/avatar/20190709
+cd /home/backup/avatar/20190417
+cp avatar -r /home/backup/avatar/20190709
+
+sh /home/apache-tomcat-8.5.6_avatar/bin/shutdown.sh    kill -9  停止服务
+替换掉非application.properties文件
+sh /home/apache-tomcat-8.5.6_avatar/bin/startup.sh               启动服务
+tail -f /home/apache-tomcat-8.5.6_avatar/logs/avatar.log         查看日志
+
+数据库操作
+172.16.4.10:1521:orcl
+username=avatar
+password=avatar
+
+
+
+mysql索引优化规则：
+mysql索引优化规则：
+
+全值匹配我最爱，最左前缀要遵守；
+带头大哥不能死，中间兄弟不能断；
+索引列上少计算，范围之后全失效；
+LIKE百分写最右，覆盖索引不写星；
+不等空值还有or，索引失效要少用；
+
+
+查询每张表的行数：
+use information_schema;
+
+select table_name,table_rows from tables
+where table_schema = '数据库名'
+order by table_rows desc;
+
+
+
+****mysql二进制安装（5.6*tar.gz）****
+
+	检查是否安装过，如果装过则删除
+	1.rpm -qa|grep mysql        rpm -e --nodeps mysql****
+	2.find / -name mysql
+	
+	安装依赖
+	3.yum search libaio         yum install libaio
+	
+	创建mysql用户和组
+	4.groupadd mysql            useradd -r -g mysql mysql
+	
+	解压到/usr/local/目录下
+	5.tar -zxvf mysql-5.6.46-linux-glibc2.12-x86_64.tar.gz -C /usr/local/
+	
+	创建软链接，类似于重命名
+	6.ln -s mysql-5.6.46-linux-glibc2.12-x86_64 mysql
+	
+	修改mysql目录下所有文件的所有者和所有组
+	7.cd /usr/local/mysql      chown -R mysql:mysql ./ 
+	
+	执行mysql_install_db或者mysqld（5.7及以上版本）脚本，对mysql中的data目录进行初始化并创建一些系统表格
+	8.scripts/mysql_install_db --user=mysql  (5.7.*以上版本：bin/mysqld --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --initialize)
+	
+	复制配置文件
+	9.cp support-files/my-default.cnf /etc/my.cnf
+	
+	复制启动关闭脚本，就可以使用service mysqld start/stop 启动/关闭mysql
+	10.cp support-files/mysql.server /etc/init.d/mysqld
+	
+	开启服务并查看是否启动
+	11.service mysqld start(/etc/init.d/mysqld start[systemctl start mysql])      ps -ef|grep mysql
+	设置开机启动 chkconfig mysqld on     chkconfig --list
+	
+	修改配置文件
+	12.vim /etc/profile          export PATH=$PATH:/usr/local/mysql/bin   source /etc/profile
+	
+	登录客户端并修改密码
+	13.mysql    set password=password('123456');  quit;
+	
+	无主机登录
+	14.use mysql;        update user set host='%' where host='localhost';    flush privileges;
+
+****mysql二进制安装（tar.gz）****
+
+
+****mysql rpm安装****
+
+	查看mysql是否安装，如果安装了，卸载mysql
+	rpm -qa|grep mysql
+	rpm -e --nodeps mysql-libs-5.1.73-7.el6.x86_64
+
+	安装MySql服务器
+		1．安装mysql服务端
+		[root@hadoop102 mysql-libs]# rpm -ivh MySQL-server-5.6.24-1.el6.x86_64.rpm
+		2．查看产生的随机密码
+		[root@hadoop102 mysql-libs]# cat /root/.mysql_secret
+		OEXaQuS8IWkG19Xs
+		3．查看mysql状态
+		[root@hadoop102 mysql-libs]# service mysql status
+		4．启动mysql
+		[root@hadoop102 mysql-libs]# service mysql start
+
+
+	安装MySql客户端
+		1．安装mysql客户端
+		[root@hadoop102 mysql-libs]# rpm -ivh MySQL-client-5.6.24-1.el6.x86_64.rpm
+		2．连接mysql
+		[root@hadoop102 mysql-libs]# mysql -uroot -pOEXaQuS8IWkG19Xs
+		3．修改密码
+		mysql>SET PASSWORD=PASSWORD('000000');
+		4．退出mysql
+		mysql>exit
+
+
+
+	修改user表，把Host表内容修改为%
+	mysql>update user set host='%' where host='localhost';
+	刷新
+	mysql>flush privileges;
+
+
+
+****mysql rpm安装****
+
+
+****mysql主从复制****
+
+
+rpm安装的配置文件在/usr/share/mysql中的my-default.cnf中，复制改名为my.cnf移动到/etc/下
+service mysqld start
+
+Master数据库上进行设置，修改配置文件/etc/my.cnf,添加如下配置:
+	设置：log-bin=mysql-bin
+	设置：server-id = 1
+	配置完成重新启动Master数据库。
+	show master status;File和Position对应的值从机要用到
+	分配一个数据库账号给slave从数据库,使从服务器能够访问master数据库:grant replication slave on *.* to 'slave'@'%' identified by 'linkdata@2019'
+	查看已分配的用户权限：select * from user；
+	mysqldump -uroot -p --opt --databases  sn sn_report > / databases.sql  #导出主数据库的数据
+	scp -r /databases.sql root@从机IP:/   #用scp把数据复制到从服务器。
+
+Slaver数据库配置, 修改配置文件/etc/my.cnf，添加如下配置
+	mysql -u root -p  < /all_databases.sql   #导入数据
+	设置：log-bin=mysql-bin
+	设置：server-id=2
+	配置完成重新启动Slave数据库。
+	执行同步SQL语句:
+
+		change master to master_host='172.168.4.51',master_user='slave',master_password='linkdata@2019',master_port=3306,master_log_file='file的值',master_log_pos=position的值;
+		
+	start slave;
+	show slave status\G
+	特别注意：如果Slave_IO_Running 与 Slave_SQL_Running 的值都必须为YES，表明成功了,其中任意一个如果不是YES都说明同步失败。
+
+****mysql主从复制****
+
+
+
+****mysql+keepalived高可用****
+
+
+
+杀死多个进程：
+
+ps -ef|grep keepalived|grep -v grep|cut -c 9-15|xargs kill -9 
+ps -ef|grep check_mysql.sh|grep -v grep|cut -c 9-15|xargs kill -9
+
+ping www.baidu.com ping不通解决办法：
+
+vim /etc/sysconfig/network-scripts/ifcfg-eth0
+
+增加Google的公共DNS服务：DNS1=8.8.8.8
+						 DNS2=8.8.4.4
+systemctl restart network.service(service network restart)
+
+cat /etc/resolv.conf
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+
+	
+	
+临时和永久关闭Selinux
+
+临时关闭：
+
+[root@localhost ~]# getenforce
+Enforcing
+
+[root@localhost ~]# setenforce 0
+
+[root@localhost ~]# getenforce
+Permissive
+
+
+永久关闭：
+
+[root@localhost ~]# vim /etc/sysconfig/selinux
+SELINUX=enforcing 改为 SELINUX=disabled
+重启服务  reboot
+
+利用show slave status\G查看slave上具体报错信息，基本上会显示表不存在，或者表是大写之类的错误，具体问题具体分析。
+
+如果是区分大小写,则mysql配置：vim /etc/mysql/my.cnf文件下设置lower_case_table_names=1(0区分大小写;1不区分大小写),设置完重启mysql 
+
+1.在slave上停止同步：stop slave;
+2.在master上重新查看file和position的值show master status；
+3.在slave上把第2步的两个值复制过来：change master to master_host='主机IP',master_user='slave',master_password='123456',master_port=3306,master_log_file='file的值',master_log_pos=position的值;
+4.在slave上开启同步：start slave;
+5.在slave上开启同步,Slave_IO_Running、Slave_SQL_Running 的值都为YES,则成功：show slave status\G  
+
+
+#master
+global_defs {
+   smtp_server 192.168.1.50 #当前主机
+   smtp_connect_timeout 30
+   router_id MYSQL-HA #表示运行keepalived服务器的一个标识
+}
+
+vrrp_script check_mysql {
+    script "/usr/local/bin/check_mysql.sh"
+    interval 22
+    weight 2
+}
+
+vrrp_instance VI_1 {
+    state BACKUP #两台配置此处均是BACKUP,设为BACKUP将根据优先级决定主或从
+    interface eth0 #绑定的网卡
+    virtual_router_id 66 #虚拟路由标识，这个标识是一个数字(取值0-255之间)确保和slave相同，同网内不同集群此项必须不同,否则发生冲突。
+    priority 100 #用来选举master的，(取值0-255之间),此处slave上设置为90
+    advert_int 1 #多久进行一次master选举（可以认为是健康查检时间间隔）
+    nopreempt #不抢占，即允许一个priority比较低的节点作为master
+    authentication {
+        auth_type PASS #认证区域
+        auth_pass 1111
+    }
+    track_script {
+        check_mysql #指定核对的脚本，check_mysql是上述自定义的
+    }
+    virtual_ipaddress {
+        192.168.1.100 #虚拟ip，如果master宕机，虚拟ip会自动漂移到slave上
+    }
+}
+
+
+
+#slave
+global_defs {
+   smtp_server 192.168.1.51 #当前主机
+   smtp_connect_timeout 30
+   router_id MYSQL-HA #表示运行keepalived服务器的一个标识
+}
+
+vrrp_script check_mysql {
+    script "/usr/local/bin/check_mysql.sh"
+    interval 22
+    weight 2
+}
+
+vrrp_instance VI_1 {
+    state BACKUP #两台配置此处均是BACKUP,设为BACKUP将根据优先级决定主或从
+    interface eth0 #绑定的网卡
+    virtual_router_id 66 #虚拟路由标识，这个标识是一个数字(取值0-255之间)确保和master相同，同网内不同集群此项必须不同,否则发生冲突。
+    priority 90 #用来选举master的，(取值0-255之间),此处master上设置为100
+    advert_int 1 #多久进行一次master选举（可以认为是健康查检时间间隔）
+    nopreempt #不抢占，即允许一个priority比较低的节点作为master
+    authentication {
+        auth_type PASS #认证区域
+        auth_pass 1111
+    }
+    track_script {
+        check_mysql #指定核对的脚本，check_mysql是上述自定义的
+    }
+    virtual_ipaddress {
+        192.168.1.100 #虚拟ip
+    }
+}
+
+
+#check_mysql.sh脚本
+#!/bin/bash
+if [ $(ps -C mysqld --no-header | wc -l) -eq 0 ]; then
+     service mysqld restart
+fi
+sleep 2
+if [ $(ps -C mysqld --no-header | wc -l) -eq 0 ]; then
+   systemctl stop keepalived.service
+fi
+
+****mysql+keepalived高可用****
+
+
+
+**** 时间同步****
+
+服务器设置:192.168.68.101
+
+	rpm -qa|grep ntp
+	yum install -y ntp
+	systemctl start ntpd
+	systemctl enable ntpd
+	systemctl is-enabled ntpd 查看是否开机启动
+
+	vim /etc/ntp.conf
+	1.注释 server (0,1,2,3).centos.pool.ntp.org iburst
+	2.添加 server 172.127.1.0
+	       fudge 172.127.1.0 startum 10       
+	       server 192.168.1.100 prefer
+
+	vim /etc/sysconfig/ntpd
+	SYNC_HWCLOCK=yes
+
+客户端设置:192.168.68.102       192.168.68.103
+
+	rpm -qa|grep ntp
+	yum install -y ntp
+    systemctl start ntpd
+	systemctl enable ntpd
+
+	vim /etc/ntp.conf
+	1.注释 server (0,1,2,3).centos.pool.ntp.org iburst
+	2.添加 server 192.168.1.100 prefer
+	
+查看同步状态：
+	ntpstat
+	ntpq -p
+	
+	
+****ntp时间同步****
+
+
+
+
+****shell编程****
+
+$n: 功能描述：n为数字，$0代表该脚本名称，$1-$9代表第一到第九个参数，十以上的参数，十以上的参数需要用大括号包含，如${10}
+
+	[atguigu@hadoop101 datas]$ vim parameter.sh
+
+	#!/bin/bash
+	echo "$0  $1   $2"
+
+	[atguigu@hadoop101 datas]$ chmod 777 parameter.sh
+
+	[atguigu@hadoop101 datas]$ ./parameter.sh cls  xz
+	./parameter.sh  cls   xz
+
+$#: 功能描述：获取所有输入参数个数，常用于循环
+
+	[atguigu@hadoop101 datas]$ vim parameter.sh
+
+	#!/bin/bash
+	echo "$0  $1  $2"
+	echo $#
+
+	[atguigu@hadoop101 datas]$ chmod 777 parameter.sh
+
+	[atguigu@hadoop101 datas]$ ./parameter.sh cls  xz
+	parameter.sh cls xz 
+	2
+
+$*: 功能描述：这个变量代表命令行中所有的参数，$*把所有的参数看成一个整体
+$@:	功能描述：这个变量也代表命令行中所有的参数，不过$@把每个参数区分对待
+
+	[atguigu@hadoop101 datas]$ vim parameter.sh
+
+	#!/bin/bash
+	echo "$0  $1   $2"
+	echo $#
+	echo $*
+	echo $@
+
+	[atguigu@hadoop101 datas]$ bash parameter.sh 1 2 3
+	parameter.sh  1   2
+	3
+	1 2 3
+	1 2 3
+
+basename: 功能描述：basename命令会删掉所有的前缀包括最后一个（‘/’）字符，然后将字符串显示出来。
+
+	[root@jone-computer datas]# basename /opt/datas/read.sh 
+	read.sh
+
+
+dirname: 功能描述：从给定的包含绝对路径的文件名中去除文件名（非目录的部分），然后返回剩下的路径（目录的部分）
+
+	[root@jone-computer datas]# dirname /opt/datas/read.sh 
+	/opt/datas
+
+cut: 工作就是“剪”，具体的说就是在文件中负责剪切数据用的。cut 命令从文件的每一行剪切字节、字符和字段并将这些字节、字符和字段输出。
+
+	选项参数	功能
+	-f	列号，提取第几列
+	-d	分隔符，按照指定分隔符分割列
+
+
+	[root@jone-computer datas]# ifconfig eth0 | grep "inet addr" | cut -d : -f 2 | cut -d " " -f 1
+	192.168.3.128
+
+sed: 一种流编辑器，它一次处理一行内容。文件内容并没有改变，除非你使用重定向存储输出。
+
+	1.	基本用法
+	sed [选项参数]  ‘command’  filename
+	2.	选项参数说明
+	选项参数	功能
+	-e	直接在指令列模式上进行sed的动作编辑。
+	3.	命令功能描述
+	命令	功能描述
+	a 	新增，a的后面可以接字串，在下一行出现
+	d	删除
+	s	查找并替换 
+	
+	数据准备
+	[atguigu@hadoop102 datas]$ touch sed.txt
+	[atguigu@hadoop102 datas]$ vim sed.txt
+	dong shen
+	guan zhen
+	wo  wo
+	lai  lai
+
+	
+	将“mei nv”这个单词插入到sed.txt第二行下，打印。
+	[atguigu@hadoop102 datas]$ sed '2a mei nv' sed.txt 
+	dong shen
+	guan zhen
+	mei nv
+	wo  wo
+	lai  lai
+
+	删除sed.txt文件所有包含wo的行
+	[atguigu@hadoop102 datas]$ sed '/wo/d' sed.txt
+	dong shen
+	guan zhen
+	lai  lai
+
+	将sed.txt文件中wo替换为ni
+	[atguigu@hadoop102 datas]$ sed 's/wo/ni/g' sed.txt 
+	dong shen
+	guan zhen
+	ni  ni
+	lai  lai
+
+	注意：‘g’表示global，全部替换
+	将sed.txt文件中的第二行删除并将wo替换为ni
+	[atguigu@hadoop102 datas]$ sed -e '2d' -e 's/wo/ni/g' sed.txt 
+	dong shen
+	ni  ni
+	lai  lai
+
+awk: 一个强大的文本分析工具，把文件逐行的读入，以空格为默认分隔符将每行切片，切开的部分再进行分析处理。
+
+	1.	基本用法
+	awk [选项参数] ‘pattern1{action1}  pattern2{action2}...’ filename
+	pattern：表示AWK在数据中查找的内容，就是匹配模式
+	action：在找到匹配内容时所执行的一系列命令
+	
+	2.	选项参数说明
+	选项参数	功能
+	-F	指定输入文件折分隔符
+	-v	赋值一个用户定义变量
+
+	搜索passwd文件以root关键字开头的所有行，并输出该行的第1列和第7列，中间以“，”号分割。
+	[atguigu@hadoop102 datas]$ awk -F: '/^root/{print $1","$7}' passwd 
+	root,/bin/bash
+	注意：只有匹配了pattern的行才会执行action
+	
+	只显示/etc/passwd的第一列和第七列，以逗号分割，且在所有行前面添加列名user，shell在最后一行添加"dahaige，/bin/zuishuai"。
+	[atguigu@hadoop102 datas]$ awk -F : 'BEGIN{print "user, shell"} {print $1","$7} END{print "dahaige,/bin/zuishuai"}' passwd
+	user, shell
+	root,/bin/bash
+	bin,/sbin/nologin
+	。。。
+	atguigu,/bin/bash
+	dahaige,/bin/zuishuai
+	注意：BEGIN 在所有数据读取行之前执行；END 在所有数据执行之后执行。
+
+	awk的内置变量
+	
+	变量	说明
+	FILENAME	文件名
+	NR	已读的记录数
+	NF	浏览记录的域的个数（切割后，列的个数）
+	
+	
+	统计passwd文件名，每行的行号，每行的列数
+	[atguigu@hadoop102 datas]$ awk -F: '{print "filename:"  FILENAME ", linenumber:" NR  ",columns:" NF}' passwd 
+	filename:passwd, linenumber:1,columns:7
+	filename:passwd, linenumber:2,columns:7
+	filename:passwd, linenumber:3,columns:7
+	
+	切割IP
+	[atguigu@hadoop102 datas]$ ifconfig eth0 | grep "inet addr" | awk -F: '{print $2}' | awk -F " " '{print $1}' 
+	192.168.1.102
+	
+	查询sed.txt中空行所在的行号
+	[atguigu@hadoop102 datas]$ awk '/^$/{print NR}' sed.txt 
+	5
+
+
+sort: 命令是在Linux里非常有用，它将文件进行排序，并将排序结果标准输出。
+	1.	基本语法
+	sort(选项)(参数)
+	
+	选项	说明
+	-n	依照数值的大小排序
+	-r	以相反的顺序来排序
+	-t	设置排序时所用的分隔字符
+	-k	指定需要排序的列
+	
+	参数：指定待排序的文件列表
+	
+	
+	数据准备
+	[atguigu@hadoop102 datas]$ touch sort.sh
+	[atguigu@hadoop102 datas]$ vim sort.sh 
+	bb:40:5.4
+	bd:20:4.2
+	xz:50:2.3
+	cls:10:3.5
+	ss:30:1.6
+	
+	按照“：”分割后的第三列倒序排序。
+	[atguigu@hadoop102 datas]$ sort -t : -nrk 3  sort.sh 
+	bb:40:5.4
+	bd:20:4.2
+	cls:10:3.5
+	xz:50:2.3
+	ss:30:1.6
+
+		#!/bin/bash
+		 #1 获取输入参数个数，如果没有参数，直接退出
+		 pcount=$#
+		 if((pcount==0)); then
+		 echo no args;
+		 exit;
+		 fi
+
+		 #2 获取文件名称
+		 p1=$1
+		 fname=`basename $p1`
+		 echo fname=$fname
+
+		 #3 获取上级目录到绝对路径
+		 pdir=`cd -P $(dirname $p1); pwd`
+		 echo pdir=$pdir
+
+		 #4 获取当前用户名称
+		 user=`whoami`
+
+		 #5 循环
+		 for((host=111; host<113; host++)); do
+		   echo ------------------- hadoop$host --------------
+		   rsync -rvl $pdir/$fname $user@hadoop$host:$pdir
+		 done
+
+
+
+****shell编程****
+
+# 按已删除文件大小逆向排序
+lsof -s|grep deleted|sort -nr -k7|less
+
+
+
+****hive****
+
+前身是：由Facebook开源用于解决海量结构化日志的数据统计。
+
+概念是：基于Hadoop的一个数据仓库工具，可以将结构化的数据文件映射为一张表，并提供类SQL查询功能。
+
+本质是：将HQL转化成MapReduce程序.
+
+Hive处理的数据存储在HDFS、底层实现是MapReduce、执行程序运行在Yarn上、默认存储在自带的derby数据库中，推荐使用MySQL存储Metastore
+
+	1.配置hive-env.sh环境变量、hive-log4j.properties日志存储路径
+	2.启动hdfs和yarn
+	3.在HDFS上创建/tmp和/user/hive/warehouse两个目录并修改他们的同组权限可写
+	4.安装mysql,mysql驱动拷贝到hive的lib目录下
+	5.配置metastore到mysql,conf下新建并配置hive-site.xml
+
+Hive常用交互命令:
+
+	1．“-e”不进入hive的交互窗口执行sql语句
+	[atguigu@hadoop102 hive]$ bin/hive -e "select id from student;"
+	
+	2．“-f”执行脚本中sql语句
+	hivef.sql中添加select *from student;
+    [atguigu@hadoop102 hive]$ bin/hive -f /opt/module/datas/hivef.sql
+	
+	3.在hive cli查看hdfs文件系统
+	hive(default)>dfs -ls /;
+	
+	4.在hive cli查看本地文件系统
+	hive(default)>! ls /opt/module/datas;
+	
+	5.查看在hive中输入的所有历史命令
+	[atguigu@hadoop102 ~]$ cat .hivehistory
+
+create table test(
+name string,
+friends array<string>,
+children map<string, int>,
+address struct<street:string, city:string>
+)
+row format delimited fields terminated by ','
+collection items terminated by '_'
+map keys terminated by ':'
+lines terminated by '\n';
+
+
+
+建表语法：
+create [external] table [if not exists] table_name 
+[(col_name data_type [comment col_comment], ...)] 
+[comment table_comment] 
+[partitioned by (col_name data_type [comment col_comment], ...)] 
+[clustered by (col_name, col_name, ...) 
+[sorted by (col_name [asc|desc], ...)] into num_buckets buckets] 
+[row format row_format] 
+[stored as file_format] 
+[location hdfs_path]
+
+管理表与外部表的互相转换
+	（1）查询表的类型
+	hive (default)> desc formatted student2;
+	Table Type:             MANAGED_TABLE
+	（2）修改内部表student2为外部表
+	alter table student2 set tblproperties('EXTERNAL'='TRUE');
+	（3）查询表的类型
+	hive (default)> desc formatted student2;
+	Table Type:             EXTERNAL_TABLE
+	（4）修改外部表student2为内部表
+	alter table student2 set tblproperties('EXTERNAL'='FALSE');
+
+加载数据到分区表中
+	hive (default)> load data local inpath '/opt/module/datas/dept.txt' into table dept_partition partition(month='201709');
+
+增加分区
+	创建单个分区
+	hive (default)> alter table dept_partition add partition(month='201706') ;
+	同时创建多个分区
+	hive (default)> alter table dept_partition add partition(month='201705') partition(month='201704');
+删除分区
+	删除单个分区
+	hive (default)> alter table dept_partition drop partition (month='201704');
+	同时删除多个分区
+	hive (default)> alter table dept_partition drop partition (month='201705'), partition (month='201706');
+查看分区表有多少分区
+	hive> show partitions dept_partition;
+查看分区表结构
+	hive> desc formatted dept_partition;
+
+
+
+
+hive数据导入：
+
+加载本地文件到hive
+	load data local inpath '/opt/module/datas/student.txt' into table student;
+
+上传文件到HDFS中
+	dfs -put /opt/module/datas/student.txt /user/hive/wirehouse;
+
+加载HDFS文件到hive
+	load data inptah '/user/hive/wirehouse/student.txt' into table student;
+
+通过查询语句向表中插入数据
+	insert into table  student select * from student;
+
+hive数据导出：
+
+将查询的结果导出到本地
+	insert overwrite local directory '/opt/module/datas/student' select * from student;
+
+将查询的结果格式化导出到本地
+	insert overwrite local directory '/opt/module/datas/student1' row format delimited fields terminated by '\t' select * from student;
+
+将查询的结果格式化导出到HDFS上（没有local）
+	insert overwrite  directory '/opt/module/datas/student2' row format delimited fields terminated by '\t' select * from student;
+
+
+清空数据:只能删除管理表的数据，不能删除外部表的数据
+	truncate table student;
+
+查看表结构
+	desc formatted student;
+
+
+1.创建分桶表
+	create table stu_bucket(id int,name string)
+	clustered by (id) into 4 buckets
+	row format delimited fields terminated by '\t';
+2.创建普通的表
+	create table stu_gen(id int,name string)
+	row format delimited fields terminated by '\t';
+3.导入数据到普通的表中
+	load  data local inpath '/opt/module/datas/stu_bucket.txt' into table stu_gen;
+4.设置bucketing属性为true
+	set hive.enforce.bucketing;
+	set hive.enforce.bucketing=true;
+	set mapreduce.job.reduces=-1;
+5.导入数据到分桶表中
+	insert into table stu_bucket select * from stu_gen;
+
+
+分桶抽样查询
+	
+	select * from stu_bucket tablesample(bucket 2 out of 2 on id);
+	语法：tablesample(bucket x out of y) 
+	条件：x<=y,y是bucket的倍数或者因子
+
+case when
+select dept_id,sum(case sex  when '男' then 1 else 0 end) male_count,sum(case sex  when '女' then 1 else 0 end) female_count from emp_sex group by dept_id;
+
+建表语句：
+
+{
+    "name": "songsong",
+    "friends": ["bingbing" , "lili"] ,       //列表Array, 
+    "children": {                      //键值Map,
+        "xiao song": 18 ,
+        "xiaoxiao song": 19
+    }
+    "address": {                      //结构Struct,
+        "street": "hui long guan" ,
+        "city": "beijing" 
+    }
+}
+
+create table test(
+name string,
+friends array<string>,
+children map<string, int>,
+address struct<street:string, city:string>
+)
+row format delimited fields terminated by ','
+collection items terminated by '_'
+map keys terminated by ':'
+lines terminated by '\n';
+
+排序：
+
+order by:全局排序，只有一个reduce，默认升序asc
+sort by:局部排序，每个reduce内部排序
+distribute by：分区排序，类似于MR中的partition,结合sort by进行使用
+cluster by：当distribute by和sort by字段一样时，可用cluster by，但是排序只能是升序，不能指定排序规则
+
+insert overwrite local directory '/opt/module/datas/distribute-result' row fromat delimited fields terminated by '\t' select * from distribute by deptno sort by sal desc;
+
+行转列：
+
+孙悟空	 白羊座	A
+大海	     射手座	A
+宋宋	     白羊座	B
+猪八戒    白羊座	A
+凤姐	     射手座	A
+
+
+
+射手座,A            大海|凤姐
+白羊座,A            孙悟空|猪八戒
+白羊座,B            宋宋
+
+1．相关函数说明 concat(string a/col, string b/col…)：返回输入字符串连接后的结果，支持任意个输入字符串;
+concat_ws(separator, str1, str2,...)：它是一个特殊形式的
+concat()。第一个参数剩余参数间的分隔符。分隔符可以是与剩余参数一样的字符串。如果分隔符是 null，返回值也将为
+null。这个函数会跳过分隔符参数后的任何 null 和空字符串。分隔符将被加到被连接的字符串之间;
+collect_set(col)：函数只接受基本数据类型，它的主要作用是将某字段的值进行去重汇总，产生array类型字段。
+
+hiveserver2
+beeline
+!connect jdbc:hive2://hadoop101:10000
+
+select concat(deptid,',',deptname) from dept;
+select concat_ws(',',deptid,deptname) from dept;//注意：concat_ws里面的字段必须是string或者array<string>类型
+select collect_set(dname) from dept;//得到的是一个string类型的数组
+
+select t1.con,concat_ws('|',collect_set(name)) from(select concat_ws(',',constellation,blood_type) con,name from person_info) t1 group by t1.con;
+
+列转行：
+
+《疑犯追踪》	悬疑,动作,科幻,剧情
+《Lie to me》	悬疑,警匪,动作,心理,剧情
+《战狼2》	战争,动作,灾难
+
+
+《疑犯追踪》      悬疑
+《疑犯追踪》      动作
+《疑犯追踪》      科幻
+《疑犯追踪》      剧情
+《Lie to me》   悬疑
+《Lie to me》   警匪
+《Lie to me》   动作
+《Lie to me》   心理
+《Lie to me》   剧情
+《战狼2》        战争
+《战狼2》        动作
+《战狼2》        灾难
+
+
+1．函数说明
+explode(col)：将hive一列中复杂的array或者map结构拆分成多行。
+lateral view
+用法：lateral view udtf(expression) tablealias as columnalias
+解释：用于和split, explode等udtf一起使用，它能够将一列数据拆成多行数据，在此基础上可以对拆分后的数据进行聚合。
+hive中有三种udf:
+    1、用户定义函数(user-defined function)udf；
+    2、用户定义聚集函数（user-defined aggregate function，udaf）；
+    3、用户定义表生成函数（user-defined table-generating function，udtf）。
+
+
+select explode(category) from movie_info;
+select movie,category_name from movie_info lateral view explode(category) new_movie_info as category_name;
+
+
+ 窗口函数：
+
+1．相关函数说明
+over()：指定分析函数工作的数据窗口大小，这个数据窗口大小可能会随着行的变而变化，跟在聚合函数后
+current row：当前行
+n preceding：往前n行数据
+n following：往后n行数据
+unbounded：起点，unbounded preceding 表示从前面的起点， unbounded following表示到后面的终点
+lag(col,n)：往前第n行数据
+lead(col,n)：往后第n行数据
+ntile(n)：把有序分区中的行分发到指定数据的组中，各个组有编号，编号从1开始，对于每一行，ntile返回此行所属的组的编号。注意：n必须为int类型。
+
+数据准备：name，orderdate，cost
+jack,2017-01-01,10
+tony,2017-01-02,15
+jack,2017-02-03,23
+tony,2017-01-04,29
+jack,2017-01-05,46
+jack,2017-04-06,42
+tony,2017-01-07,50
+jack,2017-01-08,55
+mart,2017-04-08,62
+mart,2017-04-09,68
+neil,2017-05-10,12
+mart,2017-04-11,75
+neil,2017-06-12,80
+mart,2017-04-13,94
+
+
+
+
+需求
+（1）查询在2017年4月份购买过的顾客及总人数
+	select name,count(*) from business where substring(orderdate,1,7)='2017-04' group by name;//每个顾客买的总次数，但不是总人数
+	select name,count(*) over() from business where substring(orderdate,1,7)='2017-04' group by name;
+	select distinct name,count(*) over() from business where substring(orderdate,1,7)='2017-04';
+
+（2）查询顾客的购买明细及月购买总额
+	select *,sum(cost) over() from business;
+	select month(orderdate) from business;
+	select *,sum(cost) over(distribute by month(orderdate)) from business;
+	select *,sum(cost) over(partition by month(orderdate)) from business;
+
+（3）上述的场景,要将cost按照日期进行累加
+	select *,sum(cost) over(sort by orderdate rows between unbounded preceding and current row) from business;
+	select *,sum(cost) over(sort by orderdate rows between  current row and unbounded following) from business;
+	select *,sum(cost) over(sort by orderdate rows between 1 preceding and 1 following) from business;
+	select *,sum(cost) over(distribute by name sort by orderdate rows between 1 preceding and 1 following) from business;
+	
+
+（4）查询顾客上次的购买时间
+
+	select *,lag(orderdate,1) over(distribute by name sort by orderdate),lead(orderdate,1) over(distribute by name sort by orderdate) from business;
+
+（5）查询前20%时间的订单信息
+	select *,ntile(5) over(sort by orderdate) from business;
+	select * from (select *,ntile(5) over(sort by orderdate) gid from business) t1 where t1.gid=1;
+
+rank
+1．函数说明
+rank() 排序相同时会重复，总数不会变
+dense_rank() 排序相同时会重复，总数会减少
+row_number() 会根据顺序计算
+2．数据准备
+表6-7 数据准备
+name	subject	score
+孙悟空  语文    87
+孙悟空  数学    95
+孙悟空  英语    68
+大海    语文    94
+大海    数学    56
+大海    英语    84
+宋宋    语文    64
+宋宋    数学    86
+宋宋    英语    84
+婷婷    语文    65
+婷婷    数学    85
+婷婷    英语    78
+
+
+socre	rank	dense_rank	row_number
+90		1		1			1
+80		2		2			2
+80		2		2			3
+70		4		3			4
+
+
+计算每门学科成绩排名。
+select *,rank() over(distribute by subject sort by score desc) from score;
+select *,rank() over(partition by subject order by score desc) from score;
+select *,rank() over(distribute by subject sort by score desc) rk,dense_rank() over(distribute by subject sort by score desc) dr,row_number() over(distribute by subject sort by score desc ) rw from score;
+
+
+函数：
+
+显示系统自带的函数：show functions;
+显示自带函数的用法：desc function concat_ws;         desc function collect_set;          desc function dense_rank();             desc function row_number;
+详细显示自带函数的用法：desc function extended rank;    desc function extended explode;
+
+
+insert overwrite table jointable select n.* from nullidtable n full join bigtable b on case when n.id is null then concat('hive',rand()) else n.id end = b.id;
+
+------------------------------------------------------------------------------------------------------
+
+****hive****
+
+****eclipse****
+
+
+
+****eclipse****
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

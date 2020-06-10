@@ -1,0 +1,401 @@
+
+建表语句：
+
+{
+    "name": "songsong",
+    "friends": ["bingbing" , "lili"] ,       //列表Array, 
+    "children": {                      //键值Map,
+        "xiao song": 18 ,
+        "xiaoxiao song": 19
+    }
+    "address": {                      //结构Struct,
+        "street": "hui long guan" ,
+        "city": "beijing" 
+    }
+}
+
+create table test(
+name string,
+friends array<string>,
+children map<string, int>,
+address struct<street:string, city:string>
+)
+row format delimited fields terminated by ','
+collection items terminated by '_'
+map keys terminated by ':'
+lines terminated by '\n';
+
+排序：
+
+order by:全局排序，只有一个reduce，默认升序asc
+sort by:局部排序，每个reduce内部排序
+distribute by：分区排序，类似于MR中的partition,结合sort by进行使用
+cluster by：当distribute by和sort by字段一样时，可用cluster by，但是排序只能是升序，不能指定排序规则
+
+insert overwrite local directory '/opt/module/datas/distribute-result' row fromat delimited fields terminated by '\t' select * from distribute by deptno sort by sal desc;
+
+行转列：
+
+孙悟空	 白羊座	A
+大海	     射手座	A
+宋宋	     白羊座	B
+猪八戒    白羊座	A
+凤姐	     射手座	A
+
+
+
+射手座,A            大海|凤姐
+白羊座,A            孙悟空|猪八戒
+白羊座,B            宋宋
+
+1．相关函数说明 concat(string a/col, string b/col…)：返回输入字符串连接后的结果，支持任意个输入字符串;
+concat_ws(separator, str1, str2,...)：它是一个特殊形式的
+concat()。第一个参数剩余参数间的分隔符。分隔符可以是与剩余参数一样的字符串。如果分隔符是 null，返回值也将为
+null。这个函数会跳过分隔符参数后的任何 null 和空字符串。分隔符将被加到被连接的字符串之间;
+collect_set(col)：函数只接受基本数据类型，它的主要作用是将某字段的值进行去重汇总，产生array类型字段。
+
+hiveserver2
+beeline
+!connect jdbc:hive2://hadoop101:10000
+
+select concat(deptid,',',deptname) from dept;
+select concat_ws(',',deptid,deptname) from dept;//注意：concat_ws里面的字段必须是string或者array<string>类型
+select collect_set(dname) from dept;//得到的是一个string类型的数组
+
+select t1.con,concat_ws('|',collect_set(name)) from(select concat_ws(',',constellation,blood_type) con,name from person_info) t1 group by t1.con;
+
+
+
+列转行：
+
+《疑犯追踪》	悬疑,动作,科幻,剧情
+《Lie to me》	悬疑,警匪,动作,心理,剧情
+《战狼2》	战争,动作,灾难
+
+
+《疑犯追踪》      悬疑
+《疑犯追踪》      动作
+《疑犯追踪》      科幻
+《疑犯追踪》      剧情
+《Lie to me》   悬疑
+《Lie to me》   警匪
+《Lie to me》   动作
+《Lie to me》   心理
+《Lie to me》   剧情
+《战狼2》        战争
+《战狼2》        动作
+《战狼2》        灾难
+
+
+1．函数说明
+explode(col)：将hive一列中复杂的array或者map结构拆分成多行。
+lateral view
+用法：lateral view udtf(expression) tablealias as columnalias
+解释：用于和split, explode等udtf一起使用，它能够将一列数据拆成多行数据，在此基础上可以对拆分后的数据进行聚合。
+hive中有三种udf:
+    1、用户定义函数(user-defined function)udf；
+    2、用户定义聚集函数（user-defined aggregate function，udaf）；
+    3、用户定义表生成函数（user-defined table-generating function，udtf）。
+
+
+select explode(category) from movie_info;
+select movie,category_name from movie_info lateral view explode(category) new_movie_info as category_name;
+
+
+ 窗口函数：
+
+1．相关函数说明
+over()：指定分析函数工作的数据窗口大小，这个数据窗口大小可能会随着行的变而变化，跟在聚合函数后
+current row：当前行
+n preceding：往前n行数据
+n following：往后n行数据
+unbounded：起点，unbounded preceding 表示从前面的起点， unbounded following表示到后面的终点
+lag(col,n)：往前第n行数据
+lead(col,n)：往后第n行数据
+ntile(n)：把有序分区中的行分发到指定数据的组中，各个组有编号，编号从1开始，对于每一行，ntile返回此行所属的组的编号。注意：n必须为int类型。
+
+数据准备：name，orderdate，cost
+jack,2017-01-01,10
+tony,2017-01-02,15
+jack,2017-02-03,23
+tony,2017-01-04,29
+jack,2017-01-05,46
+jack,2017-04-06,42
+tony,2017-01-07,50
+jack,2017-01-08,55
+mart,2017-04-08,62
+mart,2017-04-09,68
+neil,2017-05-10,12
+mart,2017-04-11,75
+neil,2017-06-12,80
+mart,2017-04-13,94
+
+
+需求
+（1）查询在2017年4月份购买过的顾客及总人数
+	select name,count(*) from business where substring(orderdate,1,7)='2017-04' group by name;//每个顾客买的总次数，但不是总人数
+	select name,count(*) over() from business where substring(orderdate,1,7)='2017-04' group by name;
+	select distinct name,count(*) over() from business where substring(orderdate,1,7)='2017-04';
+
+（2）查询顾客的购买明细及月购买总额
+	select *,sum(cost) over() from business;
+	select month(orderdate) from business;
+	select *,sum(cost) over(distribute by month(orderdate)) from business;
+	select *,sum(cost) over(partition by month(orderdate)) from business;
+
+（3）上述的场景,要将cost按照日期进行累加
+	select *,sum(cost) over(sort by orderdate rows between unbounded preceding and current row) from business;
+	select *,sum(cost) over(sort by orderdate rows between  current row and unbounded following) from business;
+	select *,sum(cost) over(sort by orderdate rows between 1 preceding and 1 following) from business;
+	select *,sum(cost) over(distribute by name sort by orderdate rows between 1 preceding and 1 following) from business;
+	
+
+（4）查询顾客上次的购买时间
+
+	select *,lag(orderdate,1) over(distribute by name sort by orderdate),lead(orderdate,1) over(distribute by name sort by orderdate) from business;
+
+（5）查询前20%时间的订单信息
+	select *,ntile(5) over(sort by orderdate) from business;
+	select * from (select *,ntile(5) over(sort by orderdate) gid from business) t1 where t1.gid=1;
+
+rank
+1．函数说明
+rank() 排序相同时会重复，总数不会变
+dense_rank() 排序相同时会重复，总数会减少
+row_number() 会根据顺序计算
+2．数据准备
+表6-7 数据准备
+name	subject	score
+孙悟空  语文    87
+孙悟空  数学    95
+孙悟空  英语    68
+大海    语文    94
+大海    数学    56
+大海    英语    84
+宋宋    语文    64
+宋宋    数学    86
+宋宋    英语    84
+婷婷    语文    65
+婷婷    数学    85
+婷婷    英语    78
+
+
+计算每门学科成绩排名。
+select *,rank() over(distribute by subject sort by score desc) from score;
+select *,rank() over(partition by subject order by score desc) from score;
+select *,rank() over(distribute by subject sort by score desc) rk,dense_rank() over(distribute by subject sort by score desc) dr,row_number() over(distribute by subject sort by score desc ) rw from score;
+
+
+函数：
+
+显示系统自带的函数：show functions;
+显示自带函数的用法：desc function concat_ws;         desc function collect_set;          desc function dense_rank();             desc function row_number;
+详细显示自带函数的用法：desc function extended rank;    desc function extended explode;
+
+
+insert overwrite table jointable select n.* from nullidtable n full join bigtable b on case when n.id is null then concat('hive',rand()) else n.id end = b.id;
+
+
+
+服役新数据节点
+
+服役旧数据节点：
+添加白名单：添加到白名单的主机节点，都允许访问NameNode，不在白名单的主机节点，都会被退出。
+黑名单退役：在黑名单上面的主机都会被强制退出。
+注意：不允许白名单和黑名单中同时出现同一个主机名称。
+
+
+
+desc formatted tablesname;
+
+
+
+create table gulivideo_ori(
+    videoId string comment '视频唯一id', 
+    uploader string comment '视频上传者', 
+    age int comment '视频年龄', 
+    category array<string> comment '视频类别', 
+    length int comment '视频长度', 
+    views int comment '观看次数', 
+    rate float comment '视频评分', 
+    ratings int comment '流量', 
+    comments int comment '评论数',
+    relatedId array<string>) comment '相关视频id'
+row format delimited 
+fields terminated by "\t"
+collection items terminated by "&"
+stored as textfile;
+
+create table gulivideo_user_ori(
+    uploader string,
+    videos int,
+    friends int)
+row format delimited 
+fields terminated by "\t" 
+stored as textfile;
+
+gulivideo_orc
+  
+gulivideo_user_orc
+  
+
+1.统计视频观看数Top10
+select videoId,views from gulivideo_orc order by views desc limit 10;
+
++--------------+-----------+--+
+|   videoid    |   views   |
++--------------+-----------+--+
+| dMH0bHeiRNg  | 42513417  |
+| 0XxI-hvPRRA  | 20282464  |
+| 1dmVU08zVpA  | 16087899  |
+| RB-wUgnyGv0  | 15712924  |
+| QjA5faZF1A8  | 15256922  |
+| -_CSo1gOd48  | 13199833  |
+| 49IDp76kjPw  | 11970018  |
+| tYnn51C3X_w  | 11823701  |
+| pv5zWaTEVkI  | 11672017  |
+| D2kJZOfq7zk  | 11184051  |
+| vr3x_RRJdd4  | 10786529  |
+| lsO6D1rwrKc  | 10334975  |
+| 5P6UU6m3cqk  | 10107491  |
+| 8bbTtPL1jRs  | 9579911   |
+| _BuRwH59oAo  | 9566609   |
+| aRNzWyD7C9o  | 8825788   |
+| UMf40daefsI  | 7533070   |
+| ixsZy2425eY  | 7456875   |
+| MNxwAU_xAMk  | 7066676   |
+| RUCZJVJ_M8o  | 6952767   |
++--------------+-----------+--+
+
+2.统计视频类别热度Top10
+select videoId,category_name from gulivideo_orc lateral view explode(category) new_gulivideo_orc as category_name; t1
+select category_name,count(*) hot from t1 group by category_name; t2 
+select category_name,hot from t2 order by hot desc limit 10;
+
+select category_name,hot from (select category_name,count(*) hot from
+(select videoId,category_name from gulivideo_orc lateral view
+explode(category) new_gulivideo_orc as category_name)t1 group by
+category_name)t2 order by hot desc limit 10;
+
++----------------+---------+--+
+| category_name  |   hot   |
++----------------+---------+--+
+| Music          | 179049  |
+| Entertainment  | 127674  |
+| Comedy         | 87818   |
+| Animation      | 73293   |
+| Film           | 73293   |
+| Sports         | 67329   |
+| Gadgets        | 59817   |
+| Games          | 59817   |
+| Blogs          | 48890   |
+| People         | 48890   |
++----------------+---------+--+
+
+
+3.统计视频观看数Top20所属类别
+select videoId,views from gulivideo_orc order by views desc limit 20; t1
+select videoId,views,category_name from (select videoId,views,category from gulivideo_orc order by views desc limit 20)t1 lateral view explode(category) category_t as category_name;
++--------------+-----------+----------------+--+
+|   videoid    |   views   | category_name  |
++--------------+-----------+----------------+--+
+| dMH0bHeiRNg  | 42513417  | Comedy         |
+| 0XxI-hvPRRA  | 20282464  | Comedy         |
+| 1dmVU08zVpA  | 16087899  | Entertainment  |
+| RB-wUgnyGv0  | 15712924  | Entertainment  |
+| QjA5faZF1A8  | 15256922  | Music          |
+| -_CSo1gOd48  | 13199833  | People         |
+| -_CSo1gOd48  | 13199833  | Blogs          |
+| 49IDp76kjPw  | 11970018  | Comedy         |
+| tYnn51C3X_w  | 11823701  | Music          |
+| pv5zWaTEVkI  | 11672017  | Music          |
+| D2kJZOfq7zk  | 11184051  | People         |
+| D2kJZOfq7zk  | 11184051  | Blogs          |
+| vr3x_RRJdd4  | 10786529  | Entertainment  |
+| lsO6D1rwrKc  | 10334975  | Entertainment  |
+| 5P6UU6m3cqk  | 10107491  | Comedy         |
+| 8bbTtPL1jRs  | 9579911   | Music          |
+| _BuRwH59oAo  | 9566609   | Comedy         |
+| aRNzWyD7C9o  | 8825788   | UNA            |
+| UMf40daefsI  | 7533070   | Music          |
+| ixsZy2425eY  | 7456875   | Entertainment  |
+| MNxwAU_xAMk  | 7066676   | Comedy         |
+| RUCZJVJ_M8o  | 6952767   | Entertainment  |
++--------------+-----------+----------------+--+
+
+select distinct(category_name) from (select videoId,views,category from gulivideo_orc order by views desc limit 20)t1 lateral view explode(category) category_t as category_name;
++----------------+--+
+| category_name  |
++----------------+--+
+| Blogs          |
+| Comedy         |
+| Entertainment  |
+| Music          |
+| People         |
+| UNA            |
++----------------+--+
+
+
+4.统计视频观看数Top50所关联视频的所属类别Rank
+
+a.统计观看数前50的视频
+select videoId,views,category,relatedId from gulivideo_orc order by views desc limit 50; t1
+
+b.炸开关联视频id
+select distinct(relatedId_name) from t1 lateral view explode(relatedId) relatedId_t as relatedId_name; t2
+
+c.关联视频所属类别
+select * from t2 join gulivideo_orc t3 on t2.relatedId_name=t3.videoId; t4
+
+d.炸开关联视频类别
+select * from t4 lateral view explode(category) category_t as category_name; t5 
+
+e.统计类别个数以及倒序排序
+select category_name,count(*) hot from t5 group by category_name; t6
+
+f.统计类别rank 
+select * from t6 order by hot desc;
+
+
+select * from (select category_name,count(*) hot from (select * from
+(select * from (select distinct(relatedId_name) from (select
+videoId,views,category,relatedId from gulivideo_orc order by views
+desc limit 50)t1 lateral view explode(relatedId) relatedId_t as
+relatedId_name)t2 join gulivideo_orc t3 on
+t2.relatedId_name=t3.videoId)t4 lateral view explode(category)
+category_t as category_name)t5 group by category_name)t6 order by hot
+desc;
+
++-------------------+---------+--+
+| t6.category_name  | t6.hot  |
++-------------------+---------+--+
+| Comedy            | 232     |
+| Entertainment     | 216     |
+| Music             | 195     |
+| Blogs             | 51      |
+| People            | 51      |
+| Film              | 47      |
+| Animation         | 47      |
+| News              | 22      |
+| Politics          | 22      |
+| Games             | 20      |
+| Gadgets           | 20      |
+| Sports            | 19      |
+| Howto             | 14      |
+| DIY               | 14      |
+| UNA               | 13      |
+| Places            | 12      |
+| Travel            | 12      |
+| Animals           | 11      |
+| Pets              | 11      |
+| Autos             | 4       |
+| Vehicles          | 4       |
++-------------------+---------+--+
+
+
+5.统计每个类别中的视频热度Top10
+6.统计每个类别中视频流量Top10
+7.统计上传视频最多的用户Top10以及他们上传的视频
+8.统计每个类别视频观看数Top10
+
+select * from (select videoId,categoryId,views,row_number() over(partition by categoryId order by views desc) rank from gulivideo_category) t1 where rank <= 10;
