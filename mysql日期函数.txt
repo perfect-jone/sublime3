@@ -1,0 +1,47 @@
+mysql日期函数
+
+select UTC_DATE();
+select UTC_TIME();
+select CURRENT_DATE();
+select CURRENT_DATE() + 0;
+select CURDATE(),CURTIME();
+select CURDATE() + 0;
+select CURTIME() + 0;
+select CURRENT_TIME();
+select NOW();
+select CURRENT_TIMESTAMP();
+select LOCALTIME();
+select SYSDATE();
+
+select UNIX_TIMESTAMP();
+select UNIX_TIMESTAMP("2020-01-01 00:00:00");
+select DAYNAME(CURDATE());
+select WEEK(CURDATE());
+select WEEKOFYEAR("2020-05-09");
+
+select DAYOFYEAR(curdate());
+select DAYOFMONTH(curdate());
+select DAYOFWEEK(curdate());
+select YEAR(curdate()),MONTH(curdate()),Day(curdate()),HOUR(curtime()),MINUTE(curtime()),SECOND(curtime()),QUARTER(curdate());
+
+（11）EXTRACE(type FROM date)
+
+从日期中提取一部分，type可以是YEAR、YEAR_MONTH、DAY_HOUR、DAY_MICROSECOND、DAY_MINUTE、DAY_SECOND
+
+
+select extract(unit from date)
+select extract(day_minute from now()),extract(year_month from localtime()),extract(day_hour from now()),extract(hour_minute from now());
+select extract(day_hour from '2020-05-09 12:12:12')
+select extract(day_hour from now()) dayhour
+select 
+
+（12）TIME_TO_SEC(time)
+
+返回以转换为秒的time参数，转换公式为"3600*小时 + 60*分钟 + 秒"
+
+（13）SEC_TO_TIME()
+
+和TIME_TO_SEC(time)互为反函数，将秒值转换为时间格式
+
+select station_id,dev_id,health_degree,replace(res_time,'19','22') res_time  from pv_health_box
+select station_id,dev_id,health_degree,group_concat( dev_id order by dev_id desc separator ';')  from pv_health_inverter group by dev_id;
