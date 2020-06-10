@@ -1,0 +1,678 @@
+﻿
+
+{
+  "params": "{'starttime': '2400000000','endtime': '2400000000','cf':'201907'}",
+  "filterStr": "{'rowkey':'3000118'}",
+  "orFilter": 1
+}
+
+{
+   "userName":"admin",
+   "passWord":"123456"
+}
+
+
+
+hbase org.apache.hadoop.hbase.mapreduce.Export sngs /avatar/hbase/sngs0417 1 1555430400000 1555516800000 
+
+hbase org.apache.hadoop.hbase.mapreduce.Export sngs /avatar/hbase/sngs0510 1 1557417600000 1557478800000     
+hadoop dfs -get /avatar/hbase/sngs0510 /home/sngs/sngs0510
+
+
+
+
+get "sngs","1029609",{FILTER=>"ColumnPrefixFilter('08') AND FamilyFilter(=,'substring:201910')"}
+#5月23号11:20-11:25
+1558581600000   1558581900000
+
+
+#5月23号13:50-14:00
+1558590600000   1558591200000
+get "sngs","1011693",{TIMERANGE=>[1558590600000,1558591200000]}  01000101
+get "sngs","1011730",{TIMERANGE=>[1558590600000,1558591200000]}  01000201
+get "sngs","1011767",{TIMERANGE=>[1558590600000,1558591200000]}  01000301
+get "sngs","1011804",{TIMERANGE=>[1558590600000,1558591200000]}  01000401
+
+   
+hbase org.apache.hadoop.hbase.mapreduce.Export sngs /avatar/hbase/sngs0523 1 1558540800000 1558627200000
+hdfs dfs -get /avatar/hbase/sngs0523 /home/sngs/sngs0523
+
+
+hbase org.apache.hadoop.hbase.mapreduce.Import sngs /avatar/shanneng/hbase/sngs0523
+create 'sngs',{NAME=>'201905',VERSIONS=>'1'},{NAME='timestamp',VERSIONS=>'1'}
+alter 'sngs','201905'
+
+172.16.4.50:
+http://118.190.132.107:8081/nexus/content/repositories/snapshots/com/link/sn_devproject/
+
+cat start.sh
+
+1，将原有的jar停止，在linkdata目录下运行:
+	cd /home/snjk/linkdata
+	vim start.sh 更改包名 
+	./stopServer.sh
+	
+2，将原有的jar删除或者备份（jar包在linkdata/lib目录下）
+	rm -rf 
+	
+3，将新版本jar拷贝至linkdata/lib目录下
+
+
+4，启动jar：
+	./start.sh
+
+
+若想看启动日志，则运行：tail -f linklog.log
+
+
+
+
+
+
+
+
+陕能发版四部曲：备份、采集、替换、数据库
+
+
+FTP地址
+ftp://111.204.47.160:8094   账号 ftp  密码  1qaz@WSX
+
+
+172.16.4.21:
+
+dist备份：
+mkdir -p /opt/app/backup/20190917
+cd /opt/app
+cp avatar/ -r /opt/app/backup/20190917
+把dist文件夹覆盖到/opt/app/avatar目录下
+
+/usr/local/nginx/sbin/nginx -s reload   重启服务
+
+172.16.4.13:
+
+scheduler备份：
+mkdir -p /home/backup/scheduler/20190917
+cd /home/backup/scheduler/20190802
+cp avatar -r /home/backup/scheduler/20190917
+
+启动后台前 先把采集停了  在数据采集菜单下的时序数据采集
+
+sh /home/apache-tomcat-8.5.6_scheduler/bin/shutdown.sh  或者ps -ef|grep scheduler  kill -9  停止服务
+xftp进入/home/apache-tomcat-8.5.6_scheduler/webapps/avatar/WEB-INF/ 
+替换掉非application.properties文件
+sh /home/apache-tomcat-8.5.6_scheduler/bin/startup.sh                启动服务
+tail -f /home/apache-tomcat-8.5.6_scheduler/logs/avatar.log          查看日志
+   
+
+avatar备份：
+mkdir -p /home/backup/avatar/20190917
+cd /home/backup/avatar/20190802
+cp avatar -r /home/backup/avatar/20190917
+
+sh /home/apache-tomcat-8.5.6_avatar/bin/shutdown.sh 或者ps -ef|grep avatar   kill -9  停止服务
+
+xftp进入/home/apache-tomcat-8.5.6_avatar/webapps/avatar/WEB-INF
+替换掉非application.properties文件
+sh /home/apache-tomcat-8.5.6_avatar/bin/startup.sh               启动服务
+tail -f /home/apache-tomcat-8.5.6_avatar/logs/avatar.log         查看日志
+
+后台启动成功  在开启采集   在数据采集菜单下的时序数据采集  
+
+数据库操作：执行算子sql和陕能sql(特别注意)
+172.16.4.10:1521:orcl
+username=avatar
+password=avatar
+
+
+
+
+
+get "sngs","1059215",{FILTER=>"ColumnPrefixFilter('23') AND FamilyFilter(=,'substring:201910')"}
+
+
+get "sngs","1011693",{TIMERANGE=>[1558590600000,1558591200000]}
+
+
+hbase导出数据：
+	hbase org.apache.hadoop.hbase.mapreduce.Export
+	Usage: Export [-D <property=value>]* <tablename> <outputdir> [<versions> [<starttime> [<endtime>]] [^[regex pattern] or [Prefix] to filter]]
+	-D hbase.mapreduce.scan.row.start=<ROWSTART> 开始rowkey
+    -D hbase.mapreduce.scan.row.stop=<ROWSTOP>   终止rowkey
+	-D hbase.mapreduce.scan.column.family=Info
+
+	hbase org.apache.hadoop.hbase.mapreduce.Export -D hbase.mapreduce.scan.row.start= -D hbase.mapreduce.scan.row.stop= 
+	-D hbase.mapreduce.scan.column.family=201903 
+	
+  
+hbase org.apache.hadoop.hbase.mapreduce.Export  -D hbase.mapreduce.scan.row.start=201622 -D hbase.mapreduce.scan.row.stop=207622 sngs /avatar/hbase/sngsOST2_0714 1 1563033600000 1563120000000   
+hdfs dfs -get /avatar/hbase/sngsOST2_0714 /home/sngs/sngsOST2_0714
+
+hbase org.apache.hadoop.hbase.mapreduce.Export  -D hbase.mapreduce.scan.row.start=219620 -D hbase.mapreduce.scan.row.stop=243150 sngs /avatar/hbase/sngsSQ2_0714 1 1563033600000 1563120000000   
+hdfs dfs -get /avatar/hbase/sngsSQ2_0714 /home/sngs/sngsSQ2_0714
+
+
+
+scan "sngs",{FILTER=>"FamilyFilter(=,'substring:q') AND ValueFilter(=,'substring:1.0')"}
+
+scan 'sngs',{ FILTER=>"SingleColumnValueFilter('q','q',=,'substring:1.0') AND ColumnPrefixFilter('11') AND FamilyFilter(=,'substring:201907')"}
+
+scan 'sngs',{ FILTER=>"SingleColumnValueFilter('q','q',=,'substring:2.0') AND ColumnPrefixFilter('11') AND FamilyFilter(=,'substring:201907') AND RowFilter(<=,'binary:207622') AND RowFilter(>=,'binary:201622')"}
+
+欧舒特遥信：201622   207622             遥测：1013283    1027197
+陕汽遥信：  219620   243150             遥测：1007795    1011691
+get 'sngs','3000373',{FILTER=>"ColumnPrefixFilter('19') AND FamilyFilter(=,'substring:201907')"}
+
+scan "sngs",{FILTER=>"ColumnPrefixFilter('q') AND ValueFilter(=,'substring:2.0')"} 
+
+ColumnPrefixFilter('11')
+
+
+
+hadoop fs -Dfs.default.name=file:/// -text sequence文件本地路径
+
+scan 'sngs',{FILTER=>"ColumnPrefixFilter('12') AND FamilyFilter(=,'substring:201907') AND RowFilter(<=,'binary:207622') AND RowFilter(>=,'binary:201622')"}
+
+scan 'sngs',{FILTER=>"ColumnPrefixFilter('12') AND FamilyFilter(=,'substring:201907')"}
+
+echo "scan 'sngs',{FILTER=>\"ColumnPrefixFilter('12') AND FamilyFilter(=,'substring:201907') AND RowFilter(<=,'binary:207622') AND RowFilter(>=,'binary:201622')\"}" | hbase shell > /home/sngs/ost2_0711.csv
+
+
+
+#可行
+scan 'sngs',{FILTER=>"ColumnPrefixFilter('12') AND FamilyFilter(=,'substring:201907') AND RowFilter(<=,'binary:1011691') AND RowFilter(>=,'binary:1007795')"}
+
+#不可行
+scan 'sngs',{FILTER=>"ColumnPrefixFilter('12') AND FamilyFilter(=,'substring:201907') AND RowFilter(<=,'binary:207622') AND RowFilter(>=,'binary:201622')"}
+
+#可行
+get 'sngs','201622',{FILTER=>"SingleColumnValueFilter('q','q',=,'substring:2.0') AND ColumnPrefixFilter('15') AND FamilyFilter(=,'substring:201907')"}
+
+#可行
+echo "scan 'sngs',{FILTER=>\"ColumnPrefixFilter('12') AND FamilyFilter(=,'substring:201907') AND RowFilter(<=,'binary:1011691') AND RowFilter(>=,'binary:1007795')\"}" | hbase shell > /home/sngs/ost1_0712.csv
+
+#可行
+scan 'sngs',{ FILTER=>"SingleColumnValueFilter('q','q',=,'substring:1.0') AND ColumnPrefixFilter('15') AND FamilyFilter(=,'substring:201907')"}
+
+#不可行
+scan 'sngs',{ FILTER=>"SingleColumnValueFilter('q','q',=,'substring:2') AND ColumnPrefixFilter('15') AND FamilyFilter(=,'substring:201907')"}
+
+
+
+
+
+
+欧舒特遥信：201622   207622             遥测：1013283    1027197
+陕汽遥信：  219620   243150             遥测：1007795    1011691
+
+hbase org.apache.hadoop.hbase.mapreduce.Export  -D hbase.mapreduce.scan.row.start=1031791 -D hbase.mapreduce.scan.row.stop=1032622 sngs /avatar/hbase/btdz_0819 1 1566169200000 1566180000000   
+hdfs dfs -get /avatar/hbase/btdz_0819 /home/sngs/btdz_0819 
+
+
+get 'sngs','1071946',{FILTER=>"ColumnPrefixFilter('30') AND FamilyFilter(=,'substring:201910')"}
+
+
+
+get 'sngs','1027197',{FILTER=>"ColumnPrefixFilter('19') AND FamilyFilter(=,'substring:201908')"}
+
+
+
+
+hbase org.apache.hadoop.hbase.mapreduce.Export sngs /avatar/hbase/sngs0321_0327 1 1553097600000 1553702400000     
+hadoop dfs -get /avatar/hbase/sngs0321_0327 /home/sngs/sngs0321_0327     /home/test02/sngs
+
+
+
+
+
+
+hbase org.apache.hadoop.hbase.mapreduce.Export  -D hbase.mapreduce.scan.row.start=1007795 -D hbase.mapreduce.scan.row.stop=1011691 sngs /avatar/hbase/sngs0825_0830 1 1566662400000 1567180800000   
+hdfs dfs -get /avatar/hbase/sngs0825_0830 /home/sngs/sngs0825_0830 
+
+
+hbase org.apache.hadoop.hbase.mapreduce.Export  -D hbase.mapreduce.scan.row.start=1031791 -D hbase.mapreduce.scan.row.stop=1032622 sngs /avatar/hbase/btdz_0820 1 1566255600000 1566266400000   
+hdfs dfs -get /avatar/hbase/btdz_0820 /home/sngs/btdz_0820
+
+
+
+
+hbase org.apache.hadoop.hbase.mapreduce.Export  -D hbase.mapreduce.scan.row.start=1031791 -D hbase.mapreduce.scan.row.stop=1032622 sngs /avatar/hbase/0819 1 1566169200000 1566180000000
+hdfs dfs -get /avatar/hbase/btdz_0819 /home/sngs/btdz_0819 
+
+
+
+
+
+索引优化规则：
+
+全值匹配我最爱，最左前缀要遵守；
+带头大哥不能死，中间兄弟不能断；
+索引列上少计算，范围之后全失效；
+LIKE百分写最右，覆盖索引不写星；
+不等空值还有or，索引失效要少用；
+
+create event if not exists delete_series_event
+    on schedule every 1 day starts date_add(date_add(curdate(), interval 1 day), interval 0 hour)   
+    on completion preserve enable   
+    do delete from kpi_result_series_production;
+
+
+
+
+1、检测事件是否开启
+
+　show variables like 'event_scheduler';
+
+2.开启事件
+
+　set global event_scheduler = on;
+
+  
+
+3.显示所有事件
+
+  show events;
+
+
+执行mysql语句 DO后是需要执行的sql
+
+每天凌晨0点执行
+
+create event if not exists delete_t_im_schedu_monitor_event
+    on schedule every 1 day starts date_add(date_add(curdate(), interval 1 day), interval 0 hour)   
+    on completion preserve enable   
+    do delete from t_im_schedu_monitor date(start_time)<=date(date_sub(now(),interval 30 day));
+每隔一分钟执行
+
+CREATE event IF NOT EXISTS temp_event ON SCHEDULE EVERY 1 MINUTE   
+ON COMPLETION PRESERVE   
+DO update users set support=0 where support=1;
+查看定时任务
+
+ SELECT * FROM information_schema.events; 
+关闭定时任务
+
+DROP event temp_event;
+
+1、检测事件是否开启
+
+　show variables like 'event_scheduler';
+
+2.开启事件
+
+　set global event_scheduler = on;
+
+事件语法
+CREATE
+        [DEFINER = { user | CURRENT_USER }]
+        EVENT
+        [IF NOT EXISTS]
+        event_name
+        ON SCHEDULE schedule
+        [ON COMPLETION [NOT] PRESERVE]
+        [ENABLE | DISABLE | DISABLE ON SLAVE]
+        [COMMENT 'comment']
+        DO event_body;
+    schedule:
+        AT timestamp [+ INTERVAL interval] ...
+         | EVERY interval
+        [STARTS timestamp [+ INTERVAL interval] ...]
+        [ENDS timestamp [+ INTERVAL interval] ...]
+    interval:
+      quantity {YEAR | QUARTER | MONTH | DAY | HOUR | MINUTE |
+                  WEEK | SECOND | YEAR_MONTH | DAY_HOUR |
+    DAY_MINUTE |DAY_SECOND | HOUR_MINUTE |
+    HOUR_SECOND | MINUTE_SECOND}
+
+
+创建、显示、删除索引
+create index idx_index_id on kpi_result_sq_production(index_id) 
+
+create index idx_index_name on kpi_result_sq_production(index_name) 
+
+create index idx_date_time on kpi_result_sq_production(date_time) 
+
+show index from kpi_result_sq_production
+
+drop index idx_index_id on kpi_result_sq_production
+
+drop index idx_index_name on kpi_result_sq_production
+
+drop index idx_date_time on kpi_result_sq_production
+
+show status like '%innodb_rows%';
+
+show variables like '%query%';
+
+
+show status like '%uptime%';
+show global status like '%com_select%';
+show global status like '%com_update%';
+show global status like '%com_insert%';
+show global status like '%com_delete%';
+show global status like '%slow_queries%';
+
+
+show variables like '%slow%';
+show global status like '%slow%';
+
+show variables like '%max_connections%';
+show global status like '%max_used_connections%';
+
+show variables like 'key_buffer_size';  
+show global status like 'key_read%';
+show variables like 'read_buffer_size'; 
+
+show global status like 'open%tables%';  
+show variables like 'table_cache';
+
+show global status like 'Thread%';  
+show variables like 'thread_cache_size';  
+
+show global status like 'sort%'; 
+
+show global status like 'open_files';  
+show variables like 'open_files_limit';  
+
+show global status like 'handler_read%';
+show global status like 'com_select';
+	
+	
+show tables;
+show columns;
+select * from t_im_schedu_monitor
+	
+	
+create event if not exists delete_t_im_schedu_monitor_event
+    on schedule every 1 month starts date_add(date_add(curdate(), interval 1 day), interval 0 hour)   
+    on completion preserve enable   
+    do delete from t_im_schedu_monitor;
+	
+	
+show variables like 'event_scheduler';
+
+
+select count(*) from t_im_schedu_monitor
+
+
+SHOW VARIABLES LIKE ‘performance_schema’;
+
+
+
+show variables like '%key_buffer_size%';
+show global status like '%key_read%';
+set global key_buffer_size=67108864;
+
+show variables like '%profiling%';
+show profiles;
+show profile cpu,block io for query 41;
+show profile all for query 84;
+
+
+日志分析工具
+[root@localhost mysql]# mysqldumpslow --help
+Usage: mysqldumpslow [ OPTS... ] [ LOGS... ]
+
+Parse and summarize the MySQL slow query log. Options are
+
+  --verbose    verbose
+  --debug      debug
+  --help       write this text to standard output
+
+  -v           verbose
+  -d           debug
+  -s ORDER     what to sort by (al, at, ar, c, l, r, t), 'at' is default
+                al: average lock time
+                ar: average rows sent
+                at: average query time
+                 c: count
+                 l: lock time
+                 r: rows sent
+                 t: query time  
+  -r           reverse the sort order (largest last instead of first)
+  -t NUM       just show the top n queries
+  -a           don't abstract all numbers to N and strings to 'S'
+  -n NUM       abstract numbers with at least n digits within names
+  -g PATTERN   grep: only consider stmts that include this string
+  -h HOSTNAME  hostname of db server for *-slow.log filename (can be wildcard),
+               default is '*', i.e. match all
+  -i NAME      name of server instance (if using mysql.server startup script)
+  -l           don't subtract lock time from total time
+
+
+
+
+
+
+
+
+
+****mysql二进制安装（tar.gz）****
+
+查看是否之前安装过
+1.rpm -qa|grep mysql        rpm -e --nodeps mysql****
+2.find / -name mysql
+3.yum search libaio         yum install libaio
+4.groupadd mysql            useradd -r -g mysql mysql
+5.cd /usr/local/            tar -zxvf mysql-5.6.46-linux-glibc2.12-x86_64.tar.gz
+6.ln -s mysql-5.6.46-linux-glibc2.12-x86_64 mysql
+7.chown -R mysql:mysql ./
+8.scripts/mysql_install_db --user=mysql
+9.cp support-files/my-default.cnf /etc/my.cnf
+10.cp support-files/mysql.server /etc/init.d/mysqld
+11.service mysqld start      ps -ef|grep mysql
+12.vim /etc/profile          export PATH=$PATH:/usr/local/mysql/bin   source /etc/profile
+13.mysql    set password=password('123456')  quit
+14.mysql -uroot -p
+
+
+change master to master_host='172.16.4.51',master_user='slave',master_password='linkdata@2019',master_log_file='mysql-bin.000006',master_log_pos=308957;
+        
+
+
+
+*/1 * * * * /usr/sbin/ntpdate 172.16.4.50
+
+server 172.16.4.50 prefer
+server 127.127.1.0
+fudge  127.127.1.0 stratum 10
+
+server 172.16.4.50 prefer
+
+
+
+
+
+
+
+
+inet 172.16.4.52  netmask 255.255.255.0  broadcast 172.16.4.255
+
+
+
+
+#!/bin/bash
+ #1 获取输入参数个数，如果没有参数，直接退出
+ pcount=$#
+ if((pcount==0)); then
+ echo no args;
+ exit;
+ fi
+
+ #2 获取文件名称
+ p1=$1
+ fname=`basename $p1`       
+ echo fname=$fname
+
+ #3 获取上级目录到绝对路径
+ pdir=`cd -P $(dirname $p1); pwd`
+ echo pdir=$pdir
+
+ #4 获取当前用户名称
+ user=`whoami`
+
+ #5 循环
+ for((host=111; host<113; host++)); do
+   echo ------------------- hadoop$host --------------
+   rsync -rvl $pdir/$fname $user@hadoop$host:$pdir
+ done
+
+
+
+
+
+
+
+
+
+basename /usr/local/mysql/my.cnf 
+my.cnf
+
+
+dirname /usr/local/mysql/my.cnf 
+/usr/local/mysql
+
+
+cd -P /usr/local/mysql
+
+
+http://www.aaa.com/root/123.htm
+
+
+1.取出www.aaa.com/root/123.htm
+
+2.取出123.htm
+
+3.取出http://www.aaa.com/root
+
+4.取出http:
+
+5.取出http://
+
+6.取出www.aaa.com/root/123.htm
+
+7.取出123
+
+8.取出123.htm
+
+
+
+
+
+
+
+****Linux中的标准输入输出****
+
+标准输入0    从键盘获得输入 /proc/self/fd/0 
+标准输出1    输出到屏幕（即控制台） /proc/self/fd/1 
+错误输出2    输出到屏幕（即控制台） /proc/self/fd/2 
+
+/dev/null代表linux的空设备文件，所有往这个文件里面写入的内容都会丢失，俗称“黑洞”
+
+
+如果想要正常输出和错误信息都不显示，则要把标准输出和标准错误都重定向到/dev/null， 例如：
+
+# ping www.baidu.com >/dev/null 2>/dev/null
+
+还有一种做法是将错误重定向到标准输出，然后再重定向到 /dev/null，例如：
+
+# ping www.baidu.com >/dev/null 2>&1
+
+注意：此处的顺序不能更改，否则达不到想要的效果，此时先将标准输出重定向到 /dev/null，然后将标准错误重定向到标准输出，由于标准输出已经重定向到了/dev/null，因此标准错误也会重定向到/dev/null)
+
+
+
+ll / > a.log 2>&1
+    "ll / > a.log"指将"ll /"命令标准输出重定向到a.log文件中;
+    "2>&1"指将将标准错误重定向到标准输出;
+	由于标准输出已经重定向到了a.log，因此标准错误也会重定向到a.log
+	
+	
+由于使用nohup时，会自动将输出写入nohup.out文件中，如果文件很大的话，nohup.out就会不停的增大，这是我们不希望看到的，因此，可以利用/dev/null来解决这个问题。
+
+nohup ./program >/dev/null 2>log &
+
+如果错误信息也不想要的话,&是让程序在后台运行：
+
+nohup ./program >/dev/null 2>&1 &
+	
+****Linux中的标准输入输出****
+
+
+
+
+
+#!/bin/bash
+var="http://www.aaa.com/root/123.htm"
+#1.
+echo $var |awk -F '//' '{print $2}'
+#2.
+echo $var |awk -F '/' '{print $5}'
+#3.
+echo $var |grep -o 'http.*root'
+#4.
+echo $var |awk -F '/' '{print $1}'
+#5.
+echo $var |grep -o 'http://'
+#6.
+echo $var |grep -o 'www.*htm'
+#7.
+echo $var |grep -o '123'
+#8.
+echo $var |grep -o '123.htm'
+
+
+
+
+
+
+
+
+
+
+
+
+lsof -s|grep deleted|sort -nr -k7|less
+
+
+nohup java -jar lib/sn_devproject-8.2-20191008.085238-1.jar > /dev/null 2>&1 &
+
+
+
+
+
+273531
+
+1062961
+get 'sngs','1011063',{TIMERANGE=>[1573678800000,1573736400000]}
+get 'sngs','1011071',{TIMERANGE=>[1573678800000,1573736400000]}
+
+
+
+echo "get 'sngs','1011063',{TIMERANGE=>[1573678800000,1573736400000]}" | hbase shell > /home/sngs/1011063.csv
+
+echo "get 'sngs','1011071',{TIMERANGE=>[1573678800000,1573736400000]}" | hbase shell > /home/sngs/1011071.csv
+
+
+
+
+
+get "sngs","1032156",{FILTER=>"ColumnPrefixFilter('27') AND FamilyFilter(=,'substring:201911')"}
+
+get "sngs","1031601",{FILTER=>"ColumnPrefixFilter('27') AND FamilyFilter(=,'substring:201911')"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
