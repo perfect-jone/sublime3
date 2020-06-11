@@ -26,7 +26,7 @@ git rm删掉，并且git commit
 git remote add [-t <branch>] [-m <master>] [-f] [--[no-]tags] [--mirror=<fetch|push>] <name> <url>
 
 简化版,
-git remote add 远程仓库的名字(自己起) 远程仓库的地址
+git remote add 给远程仓库地址起名(默认为origin) 远程仓库的地址
 
 具体例子
 git remote add origin git@github.com:naruto/hinata.git
