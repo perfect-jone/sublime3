@@ -1,3 +1,8 @@
+HBase key-value:(ImmutableBytesWritable, Result) table类型：TableInputFormat
+HDFS  key-value:(LongWritable,Text)  输出格式：TextInputFormat
+
+
+
 安装完vmware12和centos7.4后
 1.设置静态ip：	vi /etc/sysconfig/network-scripts/ifcfg-ens33
 	修改BOOTPROTO=static
@@ -275,6 +280,29 @@ do
 done
 =====================================================
 =========================================================================================================================
+#zk.sh  cat /etc/profile >> ~/.bashrc
+#!/bin/bash
+case $1 in
+"start"){
+	for i in hadoop101 hadoop102 hadoop103
+	do
+		ssh $i "/opt/module/zookeeper-3.4.10/bin/zkServer.sh start"
+	done
+};;
+"stop"){
+	for i in hadoop101 hadoop102 hadoop103
+	do
+		ssh $i "/opt/module/zookeeper-3.4.10/bin/zkServer.sh stop"
+	done
+};;
+"status"){
+	for i in hadoop101 hadoop102 hadoop103
+	do
+		ssh $i "/opt/module/zookeeper-3.4.10/bin/zkServer.sh status"
+	done
+};;
+esac
+
 #startcluster.sh集群启动脚本
 #!/bin/bash
 echo "==========     开始开启所有节点服务       =========="
