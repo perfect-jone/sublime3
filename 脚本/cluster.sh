@@ -11,13 +11,13 @@ case $1 in
 	ssh hadoop103  "/opt/module/hadoop-2.7.2/sbin/mr-jobhistory-daemon.sh start historyserver"
 };;
 "stop"){
-	echo "==========     正在启动HDFS               =========="
+	echo "==========     正在关闭HDFS               =========="
 	ssh hadoop101 "/opt/module/hadoop-2.7.2/sbin/stop-dfs.sh"
 
-	echo "==========     正在启动YARN               =========="
+	echo "==========     正在关闭YARN               =========="
 	ssh hadoop102 "/opt/module/hadoop-2.7.2/sbin/stop-yarn.sh"
 
-	echo "==========     正在启动JobHistoryServer   =========="
+	echo "==========     正在关闭JobHistoryServer   =========="
 	ssh hadoop103  "/opt/module/hadoop-2.7.2/sbin/mr-jobhistory-daemon.sh stop historyserver"
 };;
 esac

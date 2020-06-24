@@ -1,0 +1,14 @@
+[Unit]
+Description=mysql
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/usr/local/mysql/data/hadoop101.pid
+ExecStart=/usr/local/mysql/support-files/mysql.server start
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target
