@@ -39,3 +39,27 @@ sed -n '/.*HOME/p' /etc/profile
 
 
 sed 's/^$/\!/g' /etc/profile  将空行替换成！
+
+
+sort:
+-n:按照数字排序
+-r:倒叙
+-k:第几列
+-t:分隔符
+
+awk:
+-F:分隔符
+OFS：要输出字段的分隔符
+print $1,$3：打印第一列和第三列
+sort -nrk3 -t: /etc/passwd | awk -F: '{print $1,$3}' OFS=":"
+
+--------------------------------------------------------------------------
+
+words.txt：
+the day is sunny the the
+the sunny is is
+#统计单词个数并降序排序
+
+cat words.txt | xargs -n1 | sort | uniq -c | sort -nr | awk '{print $2,$1}'
+
+--------------------------------------------------------------------------

@@ -1,0 +1,40 @@
+#配置邮件服务
+
+yum -y install sendmail
+yum -y install mailx
+
+
+vim /etc/mail.rc
+
+#自己的邮箱
+set from=935409142@qq.com
+
+#qq邮箱用smtp.qq.com;163邮箱用smtp.163.com.根据实际情况更改
+set smtp=smtp.qq.com
+
+#自己的邮箱
+set smtp-auth-user=935409142@qq.com
+
+#授权码，需要去qq邮箱客户端设置里面开启POP3/SMTP服务来获取
+set smtp-auth-password=kfwzpeqaoelkbcac
+
+#默认是login
+set smtp-auth=login
+
+#ssl认证方式
+set ssl-verify=ignore
+
+#证书所在目录
+set nss-config-dir=/etc/pki/nssdb/
+
+-v：显示详细信息
+-s：邮件主题
+935409142@qq.com:收件人邮箱
+< test.log：要发送的文件
+mail -v -s "hi"  935409142@qq.com < test.log
+echo '欢迎来到邮件中心' | mail -s '测试' 935409142@qq.com  2740353132@qq.com
+
+mail -s "中文"  935409142@qq.com < name.txt 
+
+#!/bin/bash
+echo 'welcome to centos mailx' | mail -s 'welcome' 935409142@qq.com 2740353132@qq.com
