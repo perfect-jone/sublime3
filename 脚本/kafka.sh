@@ -7,7 +7,7 @@ case $1 in
 	do
 	    echo "==========      root@$host      =========="
 	    echo "正在启动$host"
-	    ssh $host "/opt/module/kafka/bin/kafka-server-start.sh -daemon /opt/module/kafka/config/server.properties"
+	    ssh $host "export JMX_PORT=9988 && /opt/module/kafka/bin/kafka-server-start.sh -daemon /opt/module/kafka/config/server.properties"
 	done
 };;
 "stop"){
