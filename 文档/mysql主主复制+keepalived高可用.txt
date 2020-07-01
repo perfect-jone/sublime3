@@ -1,0 +1,274 @@
+
+mysql安装
+****mysql二进制安装（5.6*tar.gz）****
+
+	检查是否安装过，如果装过则删除
+	1.rpm -qa|grep mysql        rpm -e --nodeps mysql****
+	2.find / -name mysql
+	
+	安装依赖
+	3.yum search libaio         yum install libaio
+	
+	创建mysql用户和组
+	4.groupadd mysql            useradd -r -g mysql mysql
+	
+	解压到/usr/local/目录下
+	5.tar -zxvf mysql-5.6.46-linux-glibc2.12-x86_64.tar.gz -C /usr/local/
+	
+	创建软链接或者重命名，类似于重命名
+	6.ln -s mysql-5.6.46-linux-glibc2.12-x86_64 mysql
+	  mv mysql-5.6.46-linux-glibc2.12-x86_64 mysql mysql
+	
+	修改mysql目录下所有文件的所有者和所有组
+	7.cd /usr/local/mysql      chown -R mysql:mysql ./ 
+	
+	执行mysql_install_db或者mysqld（5.7及以上版本）脚本，对mysql中的data目录进行初始化并创建一些系统表格
+	8.scripts/mysql_install_db --user=mysql  (5.7.*以上版本：bin/mysqld --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --initialize)
+	
+	复制配置文件
+	9.cp support-files/my-default.cnf /etc/my.cnf
+	
+	复制启动关闭脚本，就可以使用service mysqld start/stop 启动/关闭mysql
+	10.cp support-files/mysql.server /etc/init.d/mysqld
+	
+	开启服务并查看是否启动
+	11.service mysqld start(/etc/init.d/mysqld start[systemctl start mysql])      ps -ef|grep mysql
+	设置开机启动 chkconfig mysqld on     chkconfig --list
+	
+	修改配置文件
+	12.vim /etc/profile          export PATH=$PATH:/usr/local/mysql/bin   source /etc/profile
+	
+	登录客户端并修改密码
+	13.命令行输入mysql直接进入mysql客户端    
+	mysql> set password=password('123456');  
+	mysql> quit;
+	
+	无主机登录
+	14.mysql> use mysql;        
+	mysql> update user set host='%' where host='localhost';    
+	mysql> flush privileges;
+
+	--------------------------------------------------------------
+	#配置mysql服务(可省略)
+	#创建vim /usr/lib/systemd/system/mysqld.service
+
+	[Unit]
+	Description=mysql
+	After=syslog.target network.target remote-fs.target nss-lookup.target
+
+	[Service]
+	Type=forking
+	PIDFile=/usr/local/mysql/data/hadoop101.pid
+	ExecStart=/usr/local/mysql/support-files/mysql.server start
+	ExecReload=/bin/kill -s HUP $MAINPID
+	ExecStop=/bin/kill -s QUIT $MAINPID
+	PrivateTmp=false
+
+	[Install]
+	WantedBy=multi-user.target
+	---------------------------------------------------------------
+
+	在开机时启用一个服务：systemctl enable mysqld
+	在开机时禁用一个服务：systemctl disable mysqld
+	查看服务是否开机启动：systemctl is-enabled mysqld
+
+安装mysql和keepalived：yum install -y keepalived
+
+网络结构：
+VIP   :192.168.195.110
+MYSQL1:192.168.195.101
+MYSQL2:192.168.195.102
+
+MYSQL1修改配置文件vim /etc/my.cnf,添加如下配置:
+#开启二进制日志
+log-bin=mysql-bin
+#标识唯一id
+server-id =1
+
+MYSQL2修改配置文件vim /etc/my.cnf,添加如下配置:
+#开启二进制日志
+log-bin=mysql-bin
+#标识唯一id
+server-id =2
+
+#配置完成之后重启mysql服务器
+
+MYSQL1下进入mysql客户端
+mysql> show master status;
++------------------+----------+--------------+--------------------------------------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB                                 | Executed_Gtid_Set |
++------------------+----------+--------------+--------------------------------------------------+-------------------+
+| mysql-bin.000013 |      491 |              | information_schema,performance_schema,mysql,test |                   |
++------------------+----------+--------------+--------------------------------------------------+-------------------+
+
+mysql> grant replication slave on *.* to 'slave'@'%' identified by '123456';
+
+
+MYSQL2下进入mysql客户端
+mysql> start slave;
+mysql> show slave status\G
+
+		*************************** 1. row ***************************
+		               Slave_IO_State: Waiting for master to send event
+		                  Master_Host: 192.168.195.102
+		                  Master_User: slave
+		                  Master_Port: 3306
+		                Connect_Retry: 60
+		              Master_Log_File: mysql-bin.000010
+		          Read_Master_Log_Pos: 214
+		               Relay_Log_File: hadoop101-relay-bin.000015
+		                Relay_Log_Pos: 377
+		        Relay_Master_Log_File: mysql-bin.000010
+		             Slave_IO_Running: Yes
+		            Slave_SQL_Running: Yes
+		              Replicate_Do_DB: 
+		          Replicate_Ignore_DB: 
+		......
+		Slave_IO和Slave_SQL是YES说明同步成功
+
+mysql> change master to master_host='192.168.195.101',master_user='slave',master_password='123456',master_port=3306,master_log_file='mysql-bin.000001',master_log_pos=120;
+
+
+#到这步为止，MYSQL1为主，MYSQL2为从，下面的步骤反着来一遍，让MYSQL2为主，MYSQL1为从
+mysql> stop slave;
+mysql> show master status;
+mysql> grant replication slave on *.* to 'slave'@'%' identified by '123456';
+
+MYSQL1进入mysql客户端
+mysql> start slave
+mysql> change master to master_host='192.168.195.102',master_user='slave',master_password='123456',master_port=3306,master_log_file='mysql-bin.000005',master_log_pos=311;
+mysql> show slave status\G
+
+
+#脚本检测文件MYSQL1和MYSQL2一样
+
+--------------------------------------------------------------------------
+cd /usr/local/bin
+vim check_mysql.sh
+chmod 777 check_mysql.sh
+
+#check_mysql.sh
+#!/bin/bash
+if [ $(ps -C mysqld --no-header | wc -l) -eq 0 ]; then
+     systemctl restart mysqld
+fi
+sleep 2
+if [ $(ps -C mysqld --no-header | wc -l) -eq 0 ]; then
+   systemctl stop keepalived.service
+fi
+
+--------------------------------------------------------------------------
+vim /etc/keepalived/keepalived.conf
+#查看keepalived日志：     tail -f /var/log/messages
+#MYSQL1配置
+#master
+global_defs {
+   smtp_server 192.168.195.101 #当前主机
+   smtp_connect_timeout 30
+   router_id MYSQL-HA #表示运行keepalived服务器的一个标识
+}
+
+vrrp_script check_mysql {
+    script "/usr/local/bin/check_mysql.sh"
+    interval 22
+    weight 2
+}
+
+vrrp_instance VI_1 {
+    state BACKUP #两台配置此处均是BACKUP,设为BACKUP将根据优先级决定主或从
+    interface ens33 #绑定的网卡
+    virtual_router_id 66 #虚拟路由标识，这个标识是一个数字(取值0-255之间)确保和slave相同，同网内不同集群此项必须不同,否则发生冲突。
+    priority 100 #用来选举master的，(取值0-255之间),此处slave上设置为90
+    advert_int 1 #多久进行一次master选举（可以认为是健康查检时间间隔）
+    nopreempt #不抢占，即允许一个priority比较低的节点作为master
+    authentication {
+        auth_type PASS #认证区域
+        auth_pass 1111
+    }
+    track_script {
+        check_mysql #指定核对的脚本，check_mysql是上述自定义的
+    }
+    virtual_ipaddress {
+        192.168.195.110 #虚拟ip，如果master宕机，虚拟ip会自动漂移到slave上
+    }
+}
+
+
+#MYSQL2配置
+#slave
+global_defs {
+   smtp_server 192.168.195.102 #当前主机
+   smtp_connect_timeout 30
+   router_id MYSQL-HA #表示运行keepalived服务器的一个标识
+}
+
+vrrp_script check_mysql {
+    script "/usr/local/bin/check_mysql.sh"
+    interval 22
+    weight 2
+}
+
+vrrp_instance VI_1 {
+    state BACKUP #两台配置此处均是BACKUP,设为BACKUP将根据优先级决定主或从
+    interface ens33 #绑定的网卡
+    virtual_router_id 66 #虚拟路由标识，这个标识是一个数字(取值0-255之间)确保和master相同，同网内不同集群此项必须不同,否则发生冲突。
+    priority 90 #用来选举master的，(取值0-255之间),此处master上设置为100
+    advert_int 1 #多久进行一次master选举（可以认为是健康查检时间间隔）
+    nopreempt #不抢占，即允许一个priority比较低的节点作为master
+    authentication {
+        auth_type PASS #认证区域
+        auth_pass 1111
+    }
+    track_script {
+        check_mysql #指定核对的脚本，check_mysql是上述自定义的
+    }
+    virtual_ipaddress {
+        192.168.195.110 #虚拟ip
+    }
+}
+--------------------------------------------------------------------------
+
+
+
+分别在MYSQL1和MYSQL2上mysql和keepalived都设置成开机自启动
+systemctl enable keepalived.service 
+systemctl enable mysqld
+
+分别MYSQL1和MYSQL2上启动mysql和keepalived
+systemctl start mysqld
+systemctl start keepalived.service
+
+查看masterip是否绑定:     ip addr
+虚拟ip只能绑定一个ip，要么是master，要么是slave,下面则显示成功
+
+MYSQL1:
+    ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 00:0c:29:b9:63:31 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.195.101/24 brd 192.168.195.255 scope global ens33
+       valid_lft forever preferred_lft forever
+    inet 192.168.195.110/32 scope global ens33
+       valid_lft forever preferred_lft forever
+
+MYSQL2:
+    ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 00:0c:29:8f:4f:84 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.195.102/24 brd 192.168.195.255 scope global ens33
+       valid_lft forever preferred_lft forever
+    inet6 fe80::8b9:f071:f4ae:8790/64 scope link 
+       valid_lft forever preferred_lft forever
+
+1.测试master（MYSQL1:192.168.195.101）节点挂断后，mysql服务是否重启
+systemctl stop mysqld
+ps -ef|grep mysqld
+隔几秒钟在查看一次 ps -ef|grep mysqld
+如果mysql重启了，则成功，否则失败
+2.测试master（MYSQL1:192.168.195.101）节点挂断后，vip能否自动切换到slave（MYSQL2:192.168.195.102）
+systemctl stop keepalived.service
+systemctl stop mysqld
+ip addr(如果虚拟ip飘移到了MYSQL2:192.168.195.102则成功)
+    ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 00:0c:29:8f:4f:84 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.195.102/24 brd 192.168.195.255 scope global ens33
+       valid_lft forever preferred_lft forever
+    inet 192.168.195.110/32 scope global ens33
+       valid_lft forever preferred_lft forever

@@ -1295,7 +1295,7 @@ where table_schema = '数据库名'
 order by table_rows desc;
 
 
-
+mysql安装
 ****mysql二进制安装（5.6*tar.gz）****
 
 	检查是否安装过，如果装过则删除
@@ -1339,6 +1339,34 @@ order by table_rows desc;
 	无主机登录
 	14.use mysql;        update user set host='%' where host='localhost';    flush privileges;
 
+	-----------
+	#配置mysql服务
+	#创建/usr/lib/systemd/system/mysqld.service
+
+	[Unit]
+	Description=mysql
+	After=syslog.target network.target remote-fs.target nss-lookup.target
+
+	[Service]
+	Type=forking
+	PIDFile=/usr/local/mysql/data/hadoop101.pid
+	ExecStart=/usr/local/mysql/support-files/mysql.server start
+	ExecReload=/bin/kill -s HUP $MAINPID
+	ExecStop=/bin/kill -s QUIT $MAINPID
+	PrivateTmp=false
+
+	[Install]
+	WantedBy=multi-user.target
+	------------
+
+	在开机时启用一个服务：systemctl enable mysqld
+	在开机时禁用一个服务：systemctl disable mysqld
+	查看服务是否开机启动：systemctl is-enabled mysqld
+
+
+	查看开机启动的服务列表：systemctl list-unit-files|grep enabled
+	查看启动失败的服务列表：systemctl --failed
+
 ****mysql二进制安装（tar.gz）****
 
 
@@ -1373,6 +1401,7 @@ order by table_rows desc;
 
 
 	修改user表，把Host表内容修改为%
+	mysql>use mysql;
 	mysql>update user set host='%' where host='localhost';
 	刷新
 	mysql>flush privileges;
@@ -1393,13 +1422,35 @@ Master数据库上进行设置，修改配置文件/etc/my.cnf,添加如下配�
 	设置：server-id = 1
 	配置完成重新启动Master数据库。
 	show master status;File和Position对应的值从机要用到
-	分配一个数据库账号给slave从数据库,使从服务器能够访问master数据库:grant replication slave on *.* to 'slave'@'%' identified by 'linkdata@2019'
+	分配一个数据库账号给slave从数据库,使从服务器能够访问master数据库:grant replication slave on *.* to 'slave'@'%' identified by '123456'
 	查看已分配的用户权限：select * from user；
-	mysqldump -uroot -p --opt --databases  sn sn_report > / databases.sql  #导出主数据库的数据
+
+
+
+	a、导出整个数据库(包括数据库中的数据）
+	mysqldump -u username -p dbname > dbname.sql 
+	b、导出数据库结构（不含数据）
+	mysqldump -u username -p -d dbname > dbname.sql
+	c、导出数据库中的某张数据表（包含数据）
+	mysqldump -u username -p dbname tablename1 tablename2 tablename3> /路径/tablename.sql
+	d、导出数据库中的某张数据表的表结构（不含数据）
+	mysqldump -u username -p -d dbname tablename > tablename.sql
+
+	27 -n --no-create-db：只导出数据，而不添加CREATE DATABASE 语句。
+	28 -t --no-create-info：只导出数据，而不添加CREATE TABLE 语句。
+	29 -d --no-data：不导出任何数据，只导出数据库表结构。
+	30 -p --password：连接数据库密码
+	31 -P --port：连接数据库端口号
+	32 -u --user：指定连接的用户名。
+
+	mysqldump -uroot -p123456   sn sn_report > /databases.sql  #导出主数据库的数据
 	scp -r /databases.sql root@从机IP:/   #用scp把数据复制到从服务器。
 
 Slaver数据库配置, 修改配置文件/etc/my.cnf，添加如下配置
-	mysql -u root -p  < /all_databases.sql   #导入数据
+
+	mysql -u<username> -p<password> <dbname> < /opt/mytest_bak.sql   #数据库必须提前建好
+	先要新建sn数据库
+	mysql -u root -p123456 sn  < /all_databases.sql   #导入数据
 	设置：log-bin=mysql-bin
 	设置：server-id=2
 	配置完成重新启动Slave数据库。
