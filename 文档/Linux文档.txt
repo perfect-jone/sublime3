@@ -330,6 +330,9 @@ http://192.168.3.128:8080/(192.168.3.128是自己Linux服务器的IP,可以用if
 
 
 ***redis***
+是什么 能干嘛 去哪下 怎么玩
+1.安装依赖 gcc gcc-c++(为什么要下载依赖，因为redis使用C语言编写的)
+2.解压进入安装目录 make && make install
 
 redis:remote dictionary server
 解压文件： tar -zxvf 
@@ -370,6 +373,7 @@ del  key1     删除键
 	getrange <key> <start> <end> 相当于java中的substring,start(最小是0)开始,end结束(最大是strlen-1)
 	setrange <key> <offset> <value> 用value覆写key所存储的字符串值，从offset(0到strlen-1)开始
 	setex <key> <seconds> <value> 设置键值的同时设置过期时间
+	ttl <key> 查看键还有多长时间过期
 	getset <key> <value> 先获取旧value值，再设置新value值
 
 2.redis五大数据类型之list:
@@ -1347,6 +1351,8 @@ password=avatar
 mysql索引优化规则：
 mysql索引优化规则：
 
+mysql安装：删装建解改执复
+
 全值匹配我最爱，最左前缀要遵守；
 带头大哥不能死，中间兄弟不能断；
 索引列上少计算，范围之后全失效；
@@ -1359,6 +1365,8 @@ mysql> explain select * from account;
 +----+-------------+---------+------+---------------+------+---------+------+------+-------+
 |  1 | SIMPLE      | account | ALL  | NULL          | NULL | NULL    | NULL |    5 | NULL  |
 +----+-------------+---------+------+---------------+------+---------+------+------+-------+
+
+
 
 
 利用存储过程批量插入数据
