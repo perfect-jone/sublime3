@@ -1351,7 +1351,7 @@ password=avatar
 mysql索引优化规则：
 mysql索引优化规则：
 
-mysql安装：删装建解改执复
+mysql安装口诀：山庄间接该致富——迷瞪
 
 全值匹配我最爱，最左前缀要遵守；
 带头大哥不能死，中间兄弟不能断；
@@ -2326,25 +2326,3 @@ insert overwrite table jointable select n.* from nullidtable n full join bigtabl
 ------------------------------------------------------------------------------------------------------
 
 ****hive****
-
-****eclipse****
-
-
-
-****eclipse****
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
