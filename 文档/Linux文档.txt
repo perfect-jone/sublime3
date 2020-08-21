@@ -340,8 +340,8 @@ redis:remote dictionary server
 安装文件：先要下载C程序的编译工具 yum install gcc-c++(gcc -v) 然后make distclean清理东西后再make 最后make install
 
 cd /usr/local/bin
-redis-server /test/downloads/redis.conf   开启服务端
-redis-cli -p 6379                         开启客户端
+./redis-server /test/downloads/redis.conf   开启服务端
+./redis-cli -p 6379                         开启客户端
 ping             
 ps -ef | grep redis                       查看进程
 shutdown
@@ -447,8 +447,12 @@ redis.conf 配置项说明如下：
 3. 指定Redis监听端口，默认端口为6379，来源是意大利女歌手merz的数字键
   port 6379
 
-4. 绑定的主机地址
-  bind 127.0.0.1
+4. 绑定的主机地址,如果绑定了具体的ip地址
+  #设置成如下ip 客户端启动命令： ./redis-cli -p 6379
+  bind 0.0.0.0 
+
+  #启动客户端的时候必须指定主机ip，否则会报连接失败错误 ./redis-cli -h 192.168.195.101 -p 6379
+  #bind 192.168.195.101
 
 5.当客户端闲置多长时间后关闭连接，如果指定为0，表示关闭该功能
   timeout 300
@@ -498,7 +502,7 @@ redis.conf 配置项说明如下：
 
 18. 指定是否在每次更新操作后进行日志记录，Redis在默认情况下是异步的把数据写入磁盘，如果不开启，可能会在断电时导致一段时间内的数据丢失。
     因为 redis本身同步数据文件是按上面save条件来同步的，所以有的数据会在一段时间内只存在于内存中。默认为no
-  appendonly no
+  appendonly yes
 
 19. 指定更新日志文件名，默认为appendonly.aof
 
@@ -549,7 +553,8 @@ redis.conf 配置项说明如下：
 
 Redis Persistence：rdb/aof可以同时存在，当redis服务启动时先加载的是aof配置文件,aof优先级大于rdb
 
-rdb:在指定的时间间隔内将内存中的数据集快照写入磁盘，也就是snapshot快照，它恢复时将快照文件
+rdb:快照，顾名思义可以理解为拍照一样，把整个内存数据映射到硬盘中，保存一份到硬盘，因此恢复数据起来比较快，把数据映射回去即可，
+不像AOF，一条条的执行操作命令。在指定的时间间隔内将内存中的数据集快照写入磁盘，也就是snapshot快照，它恢复时将快照文件
 直接读到内存中。原理是fork出一条子进程，并没有对宿主文件进行操作。文件格式：dump.rdb
 
 redis会单独fork出一个子进程来进行持久化，会先将数据写入到一个临时文件中，待持久化过程都结束了，再用这个临时文件替换上次持久化
@@ -569,7 +574,23 @@ rdb文件内存清除策略(非常重要)：
 	# noeviction -> Don't evict anything, just return an error on write operations.永不过期，针对写操作，会返回错误信息。
 
 	# LRU means Least Recently   Used 最近最少使用（按时间）
-	# LFU means Least Frequently Used 最近不经常使用的（按频次）
+	# LFU means Least Frequently Used 最不经常使用的（按频次）
+	LRU算法是根据使用时间的差异来决定的，淘汰最长时间没有被使用的。
+	LFU算法是根据使用次数的差异来决定的，淘汰一段时间内，使用次数最少的。
+
+
+	假设LFU方法的时期T为10分钟，访问如下页面所花的时间正好为10分钟，内存块大小为3。
+	若所需页面顺序依次如下：
+
+	2  1  2  1  2  3  4 
+	---------------------------------------->
+
+	当需要使用页面4时，内存块中存储着1、2、3，内存块中没有页面4，就会发生缺页中断，而且此时内存块已满，需要进行页面置换。
+	若按LRU算法，应替换掉页面1。因为页面1是最长时间没有被使用的了，页面2和3都在它后面被使用过。
+	若按LFU算法，应换页面3。因为在这段时间内，页面1被访问了2次，页面2被访问了3次，而页面3只被访问了1次，一段时间内被访问的次数最少。
+
+
+
 
 aof:以日志的形式来记录每个写操作，将redis执行过的所有写操作记录下来，只许追加文件但不可以改写
 文件，redis启动之初会读取该文件重新构建数据，换言之，redis重启的时候会根据日志文件的内容将写
@@ -2087,6 +2108,7 @@ lsof -s|grep deleted|sort -nr -k7|less
 
 
 ****hive****
+元数据存储的信息口诀：表哭猎取所有类目
 
 前身是：由Facebook开源用于解决海量结构化日志的数据统计。
 
