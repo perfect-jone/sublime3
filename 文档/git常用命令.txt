@@ -2,6 +2,10 @@ git常用命令：
 
 git init
 
+git config 添加配置项目 
+git config --global user.email “you@example.com”
+git config --global user.name “Your Name”
+
 git status
 
 git add readme.txt
@@ -48,6 +52,11 @@ git remote add origin git@github.com:perfect-jone/repo-name.git 关联一个远�
 git push -u origin master 关联后，使用命令第一次推送master分支的所有内容
 
 git push origin master 此后，每次本地提交后，只要有必要，就可以使用命令推送最新修改
+
+git pull origin master
+git pull --rebase origin master
+
+rebase 变基： 把本地仓库或者当前分支的所有提交放到master最近提交的后面,但是本地仓库或者当前分支的所有提交提交id变了
 
 ***************************************************
 git关联不到gitHub，报错：git@github.com: Permission denied (publickey).
