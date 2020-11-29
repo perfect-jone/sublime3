@@ -1,5 +1,10 @@
+echo '1 2 2 3 4 4'|xargs -n 1|uniq -c|awk '{print $2,$1}'|cut -d" " -f1-2  --output-delimiter=":"|sort -t ':' -nrk2
+4:2
+2:2
+3:1
+1:1
 
-
+---------------------------------------------------------------------------------------------------
 #-d(目录) -f(文件) -e(文件、目录exists) -r(读) -w(写) -x(执行) -s(非空则真) -z(为空则真) -n(非空则真)
 val=hello
 if [ $val ]  if [ -n $val ]  if [ -z $val] 
@@ -291,8 +296,8 @@ cat words.txt | xargs -n1 | sort | uniq -c | sort -nr | awk '{print $2,$1}'
 
 
 
-
-
+批量删除jps下的所有进程
+jps | awk  '{print $1}' | xargs kill -9
 
 
 
