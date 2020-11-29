@@ -203,9 +203,9 @@ AVG(col)   求平均值，返回指定列数据的平均值
 
 DAYNAME(d)返回d对应的工作日的英文名称，如Sunday、Monday等；DAYOFWEEK(d)返回的对应一周中的索引，1表示周日、2表示周一；WEEKDAY(d)表示d对应的工作日索引，0表示周一，1表示周二
 
-（8）WEEK(d)、WEEKOFYEAR(d)
+（8）week(d,1)、yearweek(d,1)、weekofyear(d)
 
-前者计算日期d是一年中的第几周，后者计算某一天位于一年中的第几周
+表示一年中的第多少周，(d,1)中的1是模式参数，表示从星期一是一周中的第一天
 
 （9）DAYOFYEAR(d)、DAYOFMONTH(d)
 

@@ -327,11 +327,43 @@ http://192.168.3.128:8080/(192.168.3.128是自己Linux服务器的IP,可以用if
 
 ***tomcat***
 
+阻塞和非阻塞，同步和异步
+1 例子
+故事：老王烧开水。
+
+出场人物：老张，水壶两把（普通水壶，简称水壶；会响的水壶，简称响水壶）。
+
+老王想了想，有好几种等待方式
+
+1.老王用水壶煮水，并且站在那里，不管水开没开，每隔一定时间看看水开了没。－同步阻塞
+
+老王想了想，这种方法不够聪明。
+
+2.老王还是用水壶煮水，不再傻傻的站在那里看水开，跑去寝室上网，但是还是会每隔一段时间过来看看水开了没有，水没有开就走人。－同步非阻塞
+
+老王想了想，现在的方法聪明了些，但是还是不够好。
+
+3.老王这次使用高大上的响水壶来煮水，站在那里，但是不会再每隔一段时间去看水开，而是等水开了，水壶会自动的通知他。－异步阻塞
+
+老王想了想，不会呀，既然水壶可以通知我，那我为什么还要傻傻的站在那里等呢，嗯，得换个方法。
+
+4.老王还是使用响水壶煮水，跑到客厅上网去，等着响水壶自己把水煮熟了以后通知他。－异步非阻塞
+
+老王豁然，这下感觉轻松了很多。
+
+同步和异步
+
+同步就是烧开水，需要自己去轮询（每隔一段时间去看看水开了没），异步就是水开了，然后水壶会通知你水已经开了，你可以回来处理这些开水了。
+同步和异步是相对于操作结果来说，会不会等待结果返回。
+
+阻塞和非阻塞
+
+阻塞就是说在煮水的过程中，你不可以去干其他的事情，非阻塞就是在同样的情况下，可以同时去干其他的事情。阻塞和非阻塞是相对于线程是否被阻塞。
 
 
 ***redis***
 是什么 能干嘛 去哪下 怎么玩
-1.安装依赖 gcc gcc-c++(为什么要下载依赖，因为redis使用C语言编写的)
+1.安装依赖 gcc gcc-c++(为什么要下载依赖，因为redis是用C语言编写的)
 2.解压进入安装目录 make && make install
 
 redis:remote dictionary server
@@ -424,6 +456,30 @@ del  key1     删除键
     zcount <key>  <min>  <max> 统计该集合，分数区间内的元素个数 
     zrank <key>  <value> 返回该值在集合中的排名(从小到大)，从0开始
     zrevrank <key> <value> 返回该值在集合中的排名(从大到小)，从0开始
+
+什么是缓存穿透？如何避免？什么是缓存雪崩？何如避免？
+
+缓存穿透:查询不存在的key
+
+一些恶意的请求会故意查询不存在的key,请求量很大，就会对后端系统造成很大的压力。这就叫做缓存穿透。
+
+如何避免？
+
+1：对查询结果为空的情况也进行缓存，缓存时间设置短一点，或者该key对应的数据insert了之后清理缓存。
+
+2：对一定不存在的key进行过滤。可以把所有的可能存在的key放到一个大的Bitmap中，查询时通过该bitmap过滤。
+
+缓存雪崩:大量缓存同时失效
+
+当缓存服务器重启或者大量缓存集中在某一个时间段失效，这样在失效的时候，会给后端系统带来很大压力。导致系统崩溃。
+
+如何避免？
+
+1：在缓存失效后，通过加锁或者队列来控制读数据库写缓存的线程数量。比如对某个key只允许一个线程查询数据和写缓存，其他线程等待。
+
+2：做二级缓存，A1为原始缓存，A2为拷贝缓存，A1失效时，可以访问A2，A1缓存失效时间设置为短期，A2设置为长期
+
+3：不同的key，设置不同的过期时间，让缓存失效的时间点尽量均匀。
 
 
 分布式：不同的多台服务器上部署不同的服务模块（工程），他们之间通过RPC之间通信和调用
@@ -1168,6 +1224,26 @@ hdfs命令：
 
 ***hbase***
 
+rowkey设计原则： 1.rowkey长度原则：最大为64k,但是不要超过16byte，rowkey过大
+				2.rowkey唯一原则：按照字典顺序排序
+				3.rowkey散列原则：大量的client直接访问集群的一个或极少数个节点（读写）,
+				会使热点region所在的机器超出自身承受能力，引起性能下降甚至region不可用
+常见的避免热点的方法以及它们的优缺点：
+	1.加盐：rowkey前缀使用一些随机字符,缺点是同时增加了读操作的开销
+	2.hash：用Hash散列来替代随机Salt前缀的好处是能让一个给定的行有相同的前缀，这在分散了Region负载的同时，使读操作也能够推断
+	3.反转
+
+hbase(main):001:0> get 'sngs','3002135',{FILTER=>"ColumnPrefixFilter('31') AND FamilyFilter(=,'substring:202008')"}
+COLUMN                                           CELL                                                                                                                                          
+ 202008:3130015988                               timestamp=1598833215988, value=395.0                                                                                                        
+ 202008:3130137910                               timestamp=1598833337910, value=395.0                                                                                                        
+ 202008:3130259792                               timestamp=1598833459792, value=442.0                                                                                                        
+ 202008:3130381663                               timestamp=1598833581663, value=442.0                                                                                                        
+ 202008:3130503541                               timestamp=1598833703541, value=442.0                                                                                                        
+ 202008:3130625416                               timestamp=1598833825416, value=479.0                                                                                                        
+ 202008:3130747304                               timestamp=1598833947304, value=479.0                                                                                                        
+ 202008:3130869195                               timestamp=1598834069195, value=513.0                                                                                                        
+ 202008:3130991065                               timestamp=1598834191065, value=513.0
 1.HBase-->HDFS
 hbase org.apache.hadoop.hbase.mapreduce.Export 表名 新建HDFS路径
 2.HDFS-->Linux
@@ -1238,7 +1314,7 @@ hadoop dfs -get /avatar/hbase/sngs0313 /home/hbase/sngs0313
 sngs_HbaseToHDFS.sh
 #!/bin/bash
 #获得昨天日期和开始时间戳(昨天0时0分0秒)
-date_yesterday=$(date -d "-1 day" +%m%d)
+date_yesterday=$( "-1 day" +%m%d)
 yesterdayTimeStamp=$(date -d "2019$date_yesterday 00:00:00" +%s)
 #获得当天日期和结束时间戳(昨天23时59分59秒，也即当天0时0分0秒)
 date_today=$(date +%m%d)
@@ -1265,6 +1341,14 @@ chmod 777 sngs_HDFSToLocal.sh
 0 1 * * * /home/tshell/sngs_HbaseToHDFS.sh
 0 6 * * * /home/tshell/sngs_HDFSToLocal.sh
 
+
+phoenix下载安装:
+ Hbase使用三台主机，主机名为：
+ 	hadoop101:master(active)
+ 	hadoop102:master(standby)
+ 	hadoop103:slave
+ 选择对应的版本下载：https://downloads.apache.org/phoenix/apache-phoenix-4.14.3-HBase-1.3/bin/（这里hbase版本是1.3.1）
+
 ***hbase***
 
 
@@ -1280,19 +1364,29 @@ chmod 777 sngs_HDFSToLocal.sh
 
 4.last_day(now())当月最后一天
 
-5.date_sub(date_add(last_day(now()),interval 1 day),interval 1 month)当月第一天 
-  date_add(curdate(),interval -day(curdate())+1 day)当月第一天 
+5.date_add(curdate(),interval 1-day(curdate()) day) 当月第一天 
+  date_sub(curdate(),interval day(curdate())-1 day) 当月第一天
 
 6.extract(unit from date)  用于返回日期/时间的单独部分，比如年、月、日、小时、分钟等等。extract(year from now())
 
 7.year(now()) month() day() hour() minute() second()   返回给定日期/时间的年、月、日、时、分、秒
 
+最近一个月
+例如：当前日期为：2020-11-02  最近一个月为：2020-10-01~~2020-11-01
+select date_sub(curdate(), interval 1 day);
+select date_sub(date_sub(curdate(), interval 1 day),interval 1 month);
+最近一个星期
+例如：当前日期为：2020-11-02  最近一个月为：2020-10-26~~2020-11-01
+select date_sub(curdate(), interval 1 day);
+select date_sub(curdate(),interval 7 day);
 
 上月26号到当月25号
+date_add(curdate(),interval 25-day(curdate)) day) 当月25号
+date_add(date_add(curdate(),interval -1 month),interval 26-day(curdate()) day);上月26号
 select *,str_to_date(date_time,'%Y-%m-%d') date_day from kpi_result_sq_production where str_to_date(date_time,'%Y-%m-%d')>=subdate(date_sub(curdate(),interval 1 month), date_format(date_sub(curdate(),interval 1 month),'%e')-26) and str_to_date(date_time,'%Y-%m-%d') <= date_sub(date_format(now(),'%y-%m-%d'),interval extract( day from now())-25 day)
 
 当月第一天到当月最后一天
-select *,str_to_date(date_time,'%Y-%m-%d') date_day from kpi_result_sq_production where str_to_date(date_time,'%Y-%m-%d') >= date_sub(date_add(last_day(now()),interval 1 day),interval 1 month) and str_to_date(date_time,'%Y-%m-%d') <= last_day(now())
+select *,str_to_date(date_time,'%Y-%m-%d') date_day from kpi_result_sq_production where str_to_date(date_time,'%Y-%m-%d') >= date_add(curdate(),interval 1-day(curdate()) day) and str_to_date(date_time,'%Y-%m-%d') <= last_day(now())
 
 ***mysql日期函数***
 
@@ -1311,6 +1405,9 @@ date -d "-1 month" +%Y%m%d     //显示上一月的日期
 date -d "+1 month" +%Y%m%d     //显示下一月的日期
 date -d "-1 year" +%Y%m%d      //显示前一年的日期
 date -d "+1 year" +%Y%m%d      //显示下一年的日期
+
+date +"%F %T"  ==   date +"%Y-%m-%d %H:%M:%S"
+
 
 Mysql（date函数）
 date_format(now(),'%Y-%m-%d %H:%i:%S')
@@ -1387,7 +1484,7 @@ Zookeeper:
     3888 ： zookeeper端口 用于选举leader
 Hbase:
     60010：Hbase的master的WEB UI端口 （旧的） 新的是16010
-    60030：Hbase的regionServer的WEB UI 管理端口    
+    60030：Hbase的regionServer的WEB UI 管理端口    16030
 Hive:
     9083  :  metastore服务默认监听端口
     10000：Hive 的JDBC端口
@@ -2153,6 +2250,8 @@ collection items terminated by '_'
 map keys terminated by ':'
 lines terminated by '\n';
 
+行格式，分隔字段以'\t'结尾
+
 
 
 建表语法：
@@ -2350,9 +2449,19 @@ lateral view
 用法：lateral view udtf(expression) tablealias as columnalias
 解释：用于和split, explode等udtf一起使用，它能够将一列数据拆成多行数据，在此基础上可以对拆分后的数据进行聚合。
 hive中有三种udf:
-    1、用户定义函数(user-defined function)udf；
-    2、用户定义聚集函数（user-defined aggregate function，udaf）；
-    3、用户定义表生成函数（user-defined table-generating function，udtf）。
+    1、用户定义函数(user-defined function)udf；一对一
+    2、用户定义聚集函数（user-defined aggregate function，udaf）； 多对一
+    3、用户定义表生成函数（user-defined table-generating function，udtf）。 一对多
+    自定义UDF：
+    	1.继承UDF类，重写evaluate方法
+    自定义UDTF:
+    	1.继承GenericUDTF类，重写initialize、process、close方法
+    	2.打jar包
+    	3.将jar上传到服务器的的hive路径下/opt/module/hive/
+    	4.将jar包添加到Hive的classpath：add jar /opt/module/hive/xxx.jar
+    	5.创建临时函数与开发好的java class关联：create temporary function 自定义函数名 as 'com.xx.udTf.XXXUDTF';
+    用户自定义UDAF必须继承UDFA，必须提供一个实现了UDAFEvaluator接口的内部类
+
 
 
 select explode(category) from movie_info;
@@ -2367,6 +2476,8 @@ current row：当前行
 n preceding：往前n行数据
 n following：往后n行数据
 unbounded：起点，unbounded preceding 表示从前面的起点， unbounded following表示到后面的终点
+
+下面3个函数以及排序函数rank(),dense_rank(),row_number()在over()函数之前
 lag(col,n)：往前第n行数据
 lead(col,n)：往后第n行数据
 ntile(n)：把有序分区中的行分发到指定数据的组中，各个组有编号，编号从1开始，对于每一行，ntile返回此行所属的组的编号。注意：n必须为int类型。
@@ -2409,9 +2520,9 @@ mart,2017-04-13,94
 	select *,sum(cost) over(distribute by name sort by orderdate rows between 1 preceding and 1 following) from business;
 	
 
-（4）查询顾客上次的购买时间
+（4）查询顾客上次和下次的购买时间
 
-	select *,lag(orderdate,1) over(distribute by name sort by orderdate),lead(orderdate,1) over(distribute by name sort by orderdate) from business;
+	select *,lag(orderdate,1) over(distribute by name sort by orderdate) last,lead(orderdate,1) over(distribute by name sort by orderdate) next from business;
 
 （5）查询前20%时间的订单信息
 	select *,ntile(5) over(sort by orderdate) from business;

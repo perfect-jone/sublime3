@@ -1,4 +1,4 @@
-﻿
+
 
 {
   "params": "{'starttime': '2400000000','endtime': '2400000000','cf':'201907'}",
@@ -47,6 +47,8 @@ http://118.190.132.107:8081/nexus/content/repositories/snapshots/com/link/sn_dev
 
 cat start.sh
 
+大数据发版步骤：
+172.16.4.50:
 1，将原有的jar停止，在linkdata目录下运行:
 	cd /home/snjk/linkdata
 	vim start.sh 更改包名 
@@ -68,15 +70,11 @@ cat start.sh
 
 
 
-
-
-
-陕能发版四部曲：备份、采集、替换、数据库
-
-
 FTP地址
 ftp://111.204.47.160:8094   账号 ftp  密码  1qaz@WSX
 
+
+陕能avatar发版步骤：
 
 172.16.4.21:
 
@@ -225,7 +223,9 @@ hadoop dfs -get /avatar/hbase/sngs0321_0327 /home/sngs/sngs0321_0327     /home/t
 
 
 
-hbase org.apache.hadoop.hbase.mapreduce.Export  -D hbase.mapreduce.scan.row.start=1007795 -D hbase.mapreduce.scan.row.stop=1011691 sngs /avatar/hbase/sngs0825_0830 1 1566662400000 1567180800000   
+hbase org.apache.hadoop.hbase.mapreduce.Export  -D hbase.mapreduce.scan.row.start=1007795 
+-D hbase.mapreduce.scan.row.stop=1011691 sngs /avatar/hbase/sngs0825_0830 1 1566662400000 1567180800000  
+ 
 hdfs dfs -get /avatar/hbase/sngs0825_0830 /home/sngs/sngs0825_0830 
 
 
