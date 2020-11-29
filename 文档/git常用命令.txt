@@ -8,6 +8,7 @@ git config --global user.name “Your Name”
 
 git status
 
+
 git add readme.txt
 
 git commit -m "write a readme file"
